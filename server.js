@@ -308,8 +308,11 @@ app.post('/api/orders', (req, res) => {
   if (!studentName || !studentName.trim()) {
     return res.status(400).json({ success: false, message: 'Student name is required' });
   }
-  if (!pickupSlot) {
-    return res.status(400).json({ success: false, message: 'Pickup slot selection is required' });
+  if (!rollNumber || !rollNumber.trim()) {
+    return res.status(400).json({ success: false, message: 'Roll / ID number is required' });
+  }
+  if (!pickupSlot || !AVAILABLE_SLOTS.includes(pickupSlot.trim())) {
+    return res.status(400).json({ success: false, message: 'Valid pickup slot selection is required' });
   }
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ success: false, message: 'Your cart is empty' });
@@ -421,9 +424,12 @@ app.patch('/api/orders/:id/status', requireRole(['staff', 'admin']), (req, res) 
     return res.status(404).json({ success: false, message: 'Order not found' });
   }
 
-  // Prevent changing status of cancelled order
+  // Prevent changing status of cancelled or completed order
   if (order.status === 'Cancelled') {
     return res.status(400).json({ success: false, message: 'Cannot update status of an already cancelled order.' });
+  }
+  if (order.status === 'Collected') {
+    return res.status(400).json({ success: false, message: 'Cannot update status of an already completed/collected order.' });
   }
   
   const now = new Date().toISOString();
