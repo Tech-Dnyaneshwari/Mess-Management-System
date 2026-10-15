@@ -201,6 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Custom Dynamic Glow Cursor
   initCustomCursor();
 
+  // Initialize Futuristic Voice Assistant Engine
+  initVoiceAssistant();
+
   // Check URL query parameters for direct QR scan tracking (?track=YR-XXXX)
   const urlParams = new URLSearchParams(window.location.search);
   const trackToken = urlParams.get('track');
@@ -892,7 +895,7 @@ function initCustomCursor() {
   requestAnimationFrame(renderCursor);
 
   // Hover expansion on interactive elements
-  const hoverSelectors = 'button, a, input, select, textarea, .food-card, .chip, .nav-tab, .recent-token-pill, .cart-trigger-btn, .meal-pill-btn, .token-banner-qr, .qr-image-wrapper, .tracker-strip-btn';
+  const hoverSelectors = 'button, a, input, select, textarea, .food-card, .chip, .nav-tab, .recent-token-pill, .cart-trigger-btn, .meal-pill-btn, .token-banner-qr, .qr-image-wrapper, .tracker-strip-btn, .voice-search-mic-btn, .vac-chip, .vac-btn-icon, .vac-mic-toggle-btn';
   document.addEventListener('mouseover', (e) => {
     if (e.target.closest(hoverSelectors)) {
       ring.classList.add('cursor-hover');
@@ -1972,4 +1975,418 @@ function showToast(message, type = 'info') {
     toast.style.transition = 'all 0.25s ease';
     setTimeout(() => toast.remove(), 250);
   }, 3200);
+}
+
+// ==========================================================================
+// 11. AI VOICE ASSISTANT ENGINE (Web Speech API + Natural Speech Synthesis)
+// ==========================================================================
+
+const voiceState = {
+  recognition: null,
+  isListening: false,
+  isSupported: false,
+  speechFeedback: true,
+  isPaused: false
+};
+
+function initVoiceAssistant() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    console.warn('SpeechRecognition API not available in this browser. Fallback simulation enabled.');
+    voiceState.isSupported = false;
+    return;
+  }
+
+  try {
+    voiceState.recognition = new SpeechRecognition();
+    voiceState.recognition.continuous = false;
+    voiceState.recognition.interimResults = true;
+    voiceState.recognition.lang = 'en-IN'; // Optimized for Indian English & bilingual terms like Dosa, Pav, etc.
+    voiceState.isSupported = true;
+
+    voiceState.recognition.onstart = () => {
+      voiceState.isListening = true;
+      voiceState.isPaused = false;
+      updateVoiceAssistantUIState('listening');
+    };
+
+    voiceState.recognition.onresult = (event) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      const displayTranscript = finalTranscript || interimTranscript;
+      const transcriptBox = document.getElementById('vac-transcript-box');
+      if (transcriptBox && displayTranscript) {
+        transcriptBox.innerText = `"${displayTranscript}"`;
+        transcriptBox.classList.add('has-speech');
+      }
+
+      if (finalTranscript) {
+        processVoiceCommand(finalTranscript.trim());
+      }
+    };
+
+    voiceState.recognition.onerror = (event) => {
+      console.warn('Voice recognition event:', event.error);
+      if (event.error === 'no-speech') {
+        const transcriptBox = document.getElementById('vac-transcript-box');
+        if (transcriptBox) transcriptBox.innerText = '"No speech detected. Tap sample chip or speak clearly."';
+      } else if (event.error === 'not-allowed') {
+        showToast('Microphone access blocked. Click any suggestion chip below to test!', 'error');
+      }
+      updateVoiceAssistantUIState('idle');
+    };
+
+    voiceState.recognition.onend = () => {
+      voiceState.isListening = false;
+      const overlay = document.getElementById('voice-assistant-overlay');
+      if (overlay && overlay.classList.contains('active') && !voiceState.isPaused) {
+        updateVoiceAssistantUIState('idle');
+      }
+    };
+  } catch (err) {
+    console.warn('Error setting up SpeechRecognition:', err);
+    voiceState.isSupported = false;
+  }
+}
+
+function openVoiceAssistantModal() {
+  const overlay = document.getElementById('voice-assistant-overlay');
+  if (!overlay) return;
+
+  overlay.classList.add('active');
+  updateVoiceAssistantUIState('listening');
+
+  const transcriptBox = document.getElementById('vac-transcript-box');
+  if (transcriptBox) {
+    transcriptBox.innerText = '"Say \'Add 2 Masala Dosa\' or \'Show Beverages\'..."';
+    transcriptBox.classList.remove('has-speech');
+  }
+
+  // Start speech recognition if supported
+  if (voiceState.isSupported && voiceState.recognition) {
+    try {
+      voiceState.recognition.start();
+    } catch (e) {
+      // Already running
+    }
+  } else {
+    const statusText = document.getElementById('vac-status-text');
+    if (statusText) statusText.innerText = 'Voice Assistant Ready (Tap a command)';
+  }
+}
+
+function closeVoiceAssistantModal() {
+  const overlay = document.getElementById('voice-assistant-overlay');
+  if (!overlay) return;
+
+  overlay.classList.remove('active');
+  if (voiceState.recognition && voiceState.isListening) {
+    try {
+      voiceState.recognition.stop();
+    } catch (e) {}
+  }
+  voiceState.isListening = false;
+}
+
+function handleVoiceOverlayClick(e) {
+  if (e.target.id === 'voice-assistant-overlay') {
+    closeVoiceAssistantModal();
+  }
+}
+
+function toggleSpeechRecording() {
+  const btnIcon = document.getElementById('vac-mic-btn-icon');
+  const toggleBtn = document.getElementById('vac-mic-toggle-btn');
+
+  if (voiceState.isListening) {
+    voiceState.isPaused = true;
+    if (voiceState.recognition) {
+      try { voiceState.recognition.stop(); } catch (e) {}
+    }
+    voiceState.isListening = false;
+    updateVoiceAssistantUIState('idle');
+    if (btnIcon) btnIcon.innerText = '▶️ Resume Listening';
+    if (toggleBtn) toggleBtn.classList.add('resume-mode');
+  } else {
+    voiceState.isPaused = false;
+    updateVoiceAssistantUIState('listening');
+    if (btnIcon) btnIcon.innerText = '⏹️ Pause Listening';
+    if (toggleBtn) toggleBtn.classList.remove('resume-mode');
+
+    if (voiceState.isSupported && voiceState.recognition) {
+      try { voiceState.recognition.start(); } catch (e) {}
+    }
+  }
+}
+
+function toggleVoiceSpeechFeedback() {
+  voiceState.speechFeedback = !voiceState.speechFeedback;
+  const icon = document.getElementById('vac-mute-icon');
+  if (icon) {
+    icon.innerText = voiceState.speechFeedback ? '🔊' : '🔇';
+  }
+  showToast(`Voice assistant speech reply ${voiceState.speechFeedback ? 'Enabled' : 'Muted'}`, 'info');
+}
+
+function updateVoiceAssistantUIState(uiState) {
+  const orb = document.getElementById('vac-orb');
+  const statusText = document.getElementById('vac-status-text');
+
+  if (uiState === 'listening') {
+    if (orb) {
+      orb.classList.add('listening');
+      orb.classList.remove('processing');
+    }
+    if (statusText) statusText.innerText = 'Listening... Speak now 🎙️';
+  } else if (uiState === 'processing') {
+    if (orb) {
+      orb.classList.remove('listening');
+      orb.classList.add('processing');
+    }
+    if (statusText) statusText.innerText = 'Processing command... ✨';
+  } else {
+    if (orb) {
+      orb.classList.remove('listening');
+      orb.classList.remove('processing');
+    }
+    if (statusText) statusText.innerText = 'Tap mic or click a suggestion below';
+  }
+}
+
+function speakVoiceResponse(text) {
+  if (!voiceState.speechFeedback || !window.speechSynthesis) return;
+
+  try {
+    window.speechSynthesis.cancel(); // Stop prior speech
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.05;
+    utterance.pitch = 1.05;
+    utterance.lang = 'en-IN';
+    window.speechSynthesis.speak(utterance);
+  } catch (err) {
+    console.warn('Speech synthesis warning:', err);
+  }
+}
+
+function executeSimulatedVoiceCommand(commandText) {
+  const transcriptBox = document.getElementById('vac-transcript-box');
+  if (transcriptBox) {
+    transcriptBox.innerText = `"${commandText}"`;
+    transcriptBox.classList.add('has-speech');
+  }
+
+  processVoiceCommand(commandText);
+}
+
+function processVoiceCommand(rawTranscript) {
+  const transcript = rawTranscript.toLowerCase().trim();
+  updateVoiceAssistantUIState('processing');
+
+  // 1. Check for Cart Actions
+  if (transcript.includes('open cart') || transcript.includes('view cart') || transcript.includes('show cart') || transcript.includes('cart dikhao')) {
+    openCartDrawer();
+    speakVoiceResponse('Opening your cart.');
+    finishVoiceCommand(`Opened Cart (${state.cart.length} items)`);
+    return;
+  }
+
+  if (transcript.includes('close cart')) {
+    closeCartDrawer();
+    speakVoiceResponse('Closing cart.');
+    finishVoiceCommand('Closed Cart');
+    return;
+  }
+
+  if (transcript.includes('clear cart') || transcript.includes('empty cart') || transcript.includes('delete cart')) {
+    state.cart = [];
+    saveCart();
+    updateCartUI();
+    renderMenu();
+    speakVoiceResponse('Your cart has been cleared.');
+    finishVoiceCommand('Cart Cleared');
+    return;
+  }
+
+  if (transcript.includes('checkout') || transcript.includes('place order')) {
+    openCartDrawer();
+    openCheckoutModal();
+    speakVoiceResponse('Opening checkout form.');
+    finishVoiceCommand('Opening Checkout Modal');
+    return;
+  }
+
+  // 2. Check for View Navigation
+  if (transcript.includes('menu') || transcript.includes('food')) {
+    switchView('student');
+    speakVoiceResponse('Showing food menu.');
+    finishVoiceCommand('Navigated to Menu');
+    return;
+  }
+
+  if (transcript.includes('track') || transcript.includes('status')) {
+    const tokenMatch = transcript.match(/(?:yr-?)?(\d{4})/i);
+    switchView('tracking');
+    if (tokenMatch) {
+      const fullToken = 'YR-' + tokenMatch[1];
+      const trackInput = document.getElementById('tracking-token-input');
+      if (trackInput) trackInput.value = fullToken;
+      lookupOrderByToken(fullToken);
+      speakVoiceResponse(`Tracking order token ${fullToken}.`);
+      finishVoiceCommand(`Tracking Token #${fullToken}`);
+    } else {
+      speakVoiceResponse('Opening live order tracker.');
+      finishVoiceCommand('Navigated to Live Tracker');
+    }
+    return;
+  }
+
+  if (transcript.includes('review') || transcript.includes('feedback') || transcript.includes('rating')) {
+    switchView('feedback');
+    speakVoiceResponse('Viewing ratings and reviews.');
+    finishVoiceCommand('Navigated to Reviews');
+    return;
+  }
+
+  // 3. Check for Category Filter
+  if (transcript.includes('breakfast') || transcript.includes('nashta')) {
+    switchView('student');
+    filterByCategory('Breakfast');
+    speakVoiceResponse('Showing breakfast specials.');
+    finishVoiceCommand('Filtered: Breakfast Specials');
+    return;
+  }
+
+  if ((transcript.includes('snack') || transcript.includes('chaat')) && !transcript.includes('add')) {
+    switchView('student');
+    filterByCategory('Snacks');
+    speakVoiceResponse('Showing delicious snacks.');
+    finishVoiceCommand('Filtered: Snacks');
+    return;
+  }
+
+  if (transcript.includes('meal') || transcript.includes('thali') && !transcript.includes('add') || transcript.includes('lunch') || transcript.includes('dinner')) {
+    switchView('student');
+    filterByCategory('Meals');
+    speakVoiceResponse('Showing meals and thali dishes.');
+    finishVoiceCommand('Filtered: Meals & Thali');
+    return;
+  }
+
+  if ((transcript.includes('beverage') || transcript.includes('drink')) && !transcript.includes('add')) {
+    switchView('student');
+    filterByCategory('Beverages');
+    speakVoiceResponse('Showing beverages and drinks.');
+    finishVoiceCommand('Filtered: Beverages');
+    return;
+  }
+
+  if (transcript.includes('dessert') || transcript.includes('sweet') || transcript.includes('mithai') || transcript.includes('ice cream')) {
+    switchView('student');
+    filterByCategory('Desserts');
+    speakVoiceResponse('Showing desserts.');
+    finishVoiceCommand('Filtered: Desserts');
+    return;
+  }
+
+  if (transcript.includes('all') || transcript.includes('full menu') || transcript.includes('everything')) {
+    switchView('student');
+    filterByCategory('All');
+    clearSearch();
+    speakVoiceResponse('Showing all menu items.');
+    finishVoiceCommand('Filtered: All Items');
+    return;
+  }
+
+  // 4. Check for Adding Items ("Add 2 Masala Dosa", "Add Vada Pav", "Ek Chai add karo")
+  let quantity = 1;
+  const numMap = {
+    'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+    'ek': 1, 'do': 2, 'teen': 3, 'char': 4, 'paanch': 5,
+    '1': 1, '2': 2, '3': 3, '4': 4, '5': 5
+  };
+
+  for (const [word, val] of Object.entries(numMap)) {
+    const regex = new RegExp(`\\b${word}\\b`, 'i');
+    if (regex.test(transcript)) {
+      quantity = val;
+      break;
+    }
+  }
+
+  // Search through available menu items
+  let matchedItem = null;
+  let bestScore = 0;
+
+  for (const item of state.menuItems) {
+    const itemNameLower = item.name.toLowerCase();
+    if (transcript.includes(itemNameLower)) {
+      matchedItem = item;
+      bestScore = itemNameLower.length;
+      break;
+    }
+    const words = itemNameLower.split(' ');
+    for (const w of words) {
+      if (w.length > 2 && transcript.includes(w)) {
+        if (w.length > bestScore) {
+          bestScore = w.length;
+          matchedItem = item;
+        }
+      }
+    }
+  }
+
+  if (matchedItem) {
+    switchView('student');
+    if (!matchedItem.isAvailable || matchedItem.stock <= 0) {
+      speakVoiceResponse(`Sorry, ${matchedItem.name} is currently sold out.`);
+      finishVoiceCommand(`Sold Out: ${matchedItem.name}`);
+      return;
+    }
+
+    addToCart(matchedItem.id);
+    if (quantity > 1) {
+      for (let q = 1; q < quantity; q++) {
+        updateCartQuantity(matchedItem.id, 1);
+      }
+    }
+
+    speakVoiceResponse(`Added ${quantity > 1 ? quantity + ' ' : ''}${matchedItem.name} to your cart.`);
+    finishVoiceCommand(`✅ Added ${quantity}× ${matchedItem.name} to Cart`);
+    showToast(`Added ${quantity}× ${matchedItem.name} to Cart via Voice 🎙️`, 'success');
+    return;
+  }
+
+  // 5. Default Fallback: Treat as Search
+  switchView('student');
+  const cleanSearch = transcript.replace(/search|find|show|look for|dhundo/gi, '').trim();
+  const searchInput = document.getElementById('menu-search-input');
+  if (searchInput) {
+    searchInput.value = cleanSearch;
+    handleMenuSearch();
+  }
+  speakVoiceResponse(`Searching for ${cleanSearch}.`);
+  finishVoiceCommand(`🔍 Searched: "${cleanSearch}"`);
+}
+
+function finishVoiceCommand(statusMessage) {
+  const statusText = document.getElementById('vac-status-text');
+  const orb = document.getElementById('vac-orb');
+  if (statusText) statusText.innerText = statusMessage;
+  if (orb) {
+    orb.classList.remove('listening');
+    orb.classList.add('processing');
+  }
+
+  setTimeout(() => {
+    closeVoiceAssistantModal();
+  }, 1700);
 }

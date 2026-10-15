@@ -96,10 +96,16 @@ async function runTests() {
     const itemB = menuRes.body.data[1]; // e.g. Vada Pav
     const expectedTotal = (itemA.price * 2) + (itemB.price * 3);
 
+    // Pick an available slot
+    const slotsRes = await request('GET', '/api/slots');
+    const availSlot = (slotsRes.body.data && slotsRes.body.data.find(s => s.isAvailable)) 
+      ? slotsRes.body.data.find(s => s.isAvailable).slot 
+      : '02:00 PM';
+
     const calcOrderRes = await request('POST', '/api/orders', {
       studentName: 'T2 Calc Student',
       rollNumber: 'CS-002',
-      pickupSlot: '12:45 PM',
+      pickupSlot: availSlot,
       items: [
         { id: itemA.id, price: 99999, quantity: 2 }, // Sending spoofed price
         { id: itemB.id, price: 1, quantity: 3 }
@@ -107,7 +113,7 @@ async function runTests() {
     });
     assert(calcOrderRes.status === 201 && calcOrderRes.body.data.totalAmount === expectedTotal, 
       'Total amount calculated strictly from trusted DB prices (spoofed client price ignored)', 
-      `Expected ₹${expectedTotal}, Got ₹${calcOrderRes.body.data.totalAmount}`);
+      `Expected ₹${expectedTotal}, Got ₹${calcOrderRes.body && calcOrderRes.body.data ? calcOrderRes.body.data.totalAmount : calcOrderRes.body.message}`);
 
     // ----------------------------------------------------
     // TEST 3: Checkout validates required fields and pickup slot

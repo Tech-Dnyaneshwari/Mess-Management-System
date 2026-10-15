@@ -176,6 +176,11 @@
           </svg>
           <input type="text" id="menu-search-input" class="search-input" placeholder="Search delicious snacks, meals, dosa, coffee..." oninput="handleMenuSearch()">
           <button class="search-clear-btn" id="search-clear-btn" onclick="clearSearch()" style="display: none;">✕</button>
+          <button class="voice-search-mic-btn" id="voice-search-mic-btn" onclick="openVoiceAssistantModal()" title="Voice Assistant & Order by Voice (Click to speak)">
+            <span class="mic-wave-pulse"></span>
+            <span class="mic-icon-glyph">🎙️</span>
+            <span class="mic-text-badge">Voice Order</span>
+          </button>
         </div>
 
         <div class="categories-bar" id="category-filter-chips">
@@ -1091,6 +1096,63 @@
       </div>
     </div>
   </div>
+
+  <!-- ============================================================== -->
+  <!-- FUTURISTIC AI VOICE ASSISTANT HUD MODAL                        -->
+  <!-- ============================================================== -->
+  <div class="voice-assistant-overlay" id="voice-assistant-overlay" onclick="handleVoiceOverlayClick(event)">
+    <div class="voice-assistant-card" id="voice-assistant-card">
+      <div class="vac-header">
+        <div class="vac-badge">
+          <span class="vac-dot-pulse"></span>
+          <span>CAMPUS MESS AI VOICE ASSISTANT</span>
+        </div>
+        <div class="vac-header-actions">
+          <button class="vac-btn-icon" id="vac-voice-mute-btn" onclick="toggleVoiceSpeechFeedback()" title="Toggle voice speech reply">
+            <span id="vac-mute-icon">🔊</span>
+          </button>
+          <button class="vac-btn-icon" onclick="closeVoiceAssistantModal()" title="Close voice assistant">✕</button>
+        </div>
+      </div>
+
+      <div class="vac-visualizer-area">
+        <div class="vac-orb" id="vac-orb">
+          <div class="vac-waves" id="vac-waves">
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+          </div>
+          <div class="vac-orb-icon" id="vac-orb-icon">🎙️</div>
+        </div>
+        <h3 class="vac-status-text" id="vac-status-text">Listening... Speak now</h3>
+        <div class="vac-transcript-box" id="vac-transcript-box">"Say 'Add 2 Masala Dosa' or 'Show Beverages'..."</div>
+      </div>
+
+      <div class="vac-suggestions-wrap">
+        <span class="vac-suggestions-label">Try speaking or tap any command:</span>
+        <div class="vac-chips">
+          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Add Masala Dosa')">🥞 "Add Masala Dosa"</button>
+          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Add 2 Vada Pav')">🥪 "Add 2 Vada Pav"</button>
+          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Show Beverages')">☕ "Show Beverages"</button>
+          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Show Breakfast')">🥞 "Show Breakfast"</button>
+          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Open Cart')">🛒 "Open Cart"</button>
+          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Show All Items')">🍽️ "Show All Items"</button>
+          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Track YR-1001')">📍 "Track YR-1001"</button>
+          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Clear Cart')">🗑️ "Clear Cart"</button>
+        </div>
+      </div>
+
+      <div class="vac-footer">
+        <button class="vac-mic-toggle-btn" id="vac-mic-toggle-btn" onclick="toggleSpeechRecording()">
+          <span id="vac-mic-btn-icon">⏹️ Pause Listening</span>
+        </button>
+        <span class="vac-hint-text">Web Speech API • Indian & English Accents Supported</span>
+      </div>
+    </div>
+  </div>
+
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- JAVASCRIPT LOGIC -->
