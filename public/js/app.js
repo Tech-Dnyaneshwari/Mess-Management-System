@@ -2172,7 +2172,7 @@ function yuluSpeak(text) {
   }
 }
 
-function addYuluMessage(sender, text) {
+function addYuluMessage(sender, text, action = null) {
   const feed = document.getElementById('yulu-chat-feed');
   if (!feed) return;
 
@@ -2182,19 +2182,63 @@ function addYuluMessage(sender, text) {
   const avatar = sender === 'ai' ? '🤖' : '👤';
   const authorName = sender === 'ai' ? 'Yulu AI' : 'You';
 
-  // Format basic bold markdown **text**
-  const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Format basic bold markdown **text** and newlines
+  const formattedText = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+
+  let actionHtml = '';
+  if (action && action.title) {
+    actionHtml = `
+      <div class="yulu-smart-action-card">
+        <div class="ysac-title">${action.title}</div>
+        <div class="ysac-desc">${action.desc || ''}</div>
+        <button class="ysac-order-btn" type="button">${action.btnText || '⚡ 1-Click Order'}</button>
+      </div>
+    `;
+  }
 
   msgDiv.innerHTML = `
     <div class="ym-avatar">${avatar}</div>
     <div class="ym-bubble">
       <div class="ym-author">${authorName}</div>
       <div class="ym-text">${formattedText}</div>
+      ${actionHtml}
     </div>
   `;
 
+  if (action && action.onClick) {
+    const btn = msgDiv.querySelector('.ysac-order-btn');
+    if (btn) {
+      btn.onclick = action.onClick;
+    }
+  }
+
   feed.appendChild(msgDiv);
   feed.scrollTop = feed.scrollHeight;
+}
+
+// 1-Click order execution for recommended intelligence combos
+async function orderRecommendedCombo(itemIds, comboName) {
+  state.cart = [];
+  
+  for (const id of itemIds) {
+    const item = state.menuItems.find(m => m.id === id);
+    if (item && item.isAvailable && item.stock > 0) {
+      addToCart(item.id);
+    }
+  }
+  
+  if (state.cart.length === 0) {
+    addYuluMessage('ai', `⚠️ Sorry, items for **${comboName}** are currently out of stock.`);
+    yuluSpeak(`Sorry, items for ${comboName} are out of stock right now.`);
+    return;
+  }
+  
+  const total = state.cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+  addYuluMessage('ai', `⚡ Selected **${comboName}** (Total ₹${total})! Executing instant 1-shot booking...`);
+  yuluSpeak(`Booking ${comboName} now.`);
+  await executeAutonomousOrder();
 }
 
 function clearYuluChat() {
@@ -2439,6 +2483,214 @@ function processYuluCommand(rawTranscript) {
     }
     updateYuluOrbUI('idle', 'Live Tracker Active', 'Showing real-time kitchen pipeline');
     return;
+  }
+
+  // =========================================================================
+  // YULU AI CONVERSATIONAL INTELLIGENCE & REASONING ENGINE
+  // =========================================================================
+
+  // A. Mess Timings & Schedule
+  if (transcript.includes('timing') || transcript.includes('schedule') || transcript.includes('open time') || transcript.includes('close time') || transcript.includes('kab khulta') || transcript.includes('band hota')) {
+    addYuluMessage('ai', "🕒 **Campus Mess Schedule & Operations:**\n\n• 🥞 **Breakfast**: 7:30 AM – 11:00 AM\n• 🍛 **Lunch**: 12:00 PM – 3:30 PM\n• 🥪 **Evening Snacks**: 4:00 PM – 7:00 PM\n• 🌙 **Dinner**: 7:30 PM – 10:30 PM\n\n🍽️ *Counter 2* is open throughout for quick order collections.");
+    yuluSpeak("The mess is open from 7:30 AM for breakfast, 12:00 PM for lunch, 4:00 PM for snacks, and 7:30 PM for dinner. Counter 2 is active for collections.");
+    updateYuluOrbUI('idle', 'Mess Operating Hours', 'Breakfast: 7:30AM | Lunch: 12:00PM | Snacks: 4:00PM | Dinner: 7:30PM');
+    return;
+  }
+
+  // B. Payment Methods & Counter Policy
+  if (transcript.includes('payment') || transcript.includes('how to pay') || transcript.includes('upi') || transcript.includes('cash') || transcript.includes('paise')) {
+    addYuluMessage('ai', "💵 **Mess Payment Guide:**\n\n• **Zero Online Pre-payment**: Orders booked via Yulu AI require no upfront card.\n• **Counter 2 Payment**: Simply pay with **Cash** or scan the **UPI QR Code** at Counter 2 when collecting your warm tray.\n• Tokens with unpaid balances are collected smoothly on arrival.");
+    yuluSpeak("You can pay directly via Cash or UPI at Counter 2 when collecting your food token.");
+    updateYuluOrbUI('idle', 'Payment at Counter 2', 'Cash & UPI QR accepted at pickup');
+    return;
+  }
+
+  // C. Order Cancellation Policy
+  if (transcript.includes('how to cancel') || transcript.includes('cancel rule') || transcript.includes('cancellation policy')) {
+    addYuluMessage('ai', "🔄 **Order Cancellation Policy:**\n\n• Students can cancel an active order anytime while it is in **'Order Placed'** or **'Accepted'** status from the Live Meal Tracker.\n• Once the kitchen status turns to **'Preparing'**, cancellation is locked to prevent food waste.\n• Upon cancellation, all reserved portions are restored to mess stock immediately.");
+    yuluSpeak("You can cancel your order while in Order Placed or Accepted stage from the live tracker.");
+    updateYuluOrbUI('idle', 'Cancellation Policy', 'Permitted before food preparation begins');
+    return;
+  }
+
+  // D. Assistant Identity & Capabilities
+  if (transcript.includes('who are you') || transcript.includes('kaun ho') || transcript.includes('what can you do') || transcript.includes('kya kar sakte') || transcript.includes('help me') || transcript === 'help') {
+    addYuluMessage('ai', "🤖 **Namaste! I am Yulu AI, your campus mess copilot.**\n\nHere is what I can do for you:\n• 💰 **Budget Reasoning**: Ask *'Best under ₹100'* or *'Under ₹50'* for smart combos.\n• ⏱️ **Speed Express**: Ask *'Fastest food'* for dishes ready in <5 mins.\n• 💪 **Fitness & Diet**: Ask *'High protein option'* for gym macros (~24g protein).\n• ☀️ **Meal of the Moment**: Ask *'What is special right now?'*.\n• ⚡ **1-Shot Autonomous Order**: Say *'Order 2 Masala Dosa'* or *'Order Vada Pav'*!");
+    yuluSpeak("I am Yulu AI! I can suggest budget combos, find meals under 5 minutes, track fitness macros, and place orders with 1 voice command.");
+    updateYuluOrbUI('idle', 'Yulu AI Copilot', 'Try: "Best under ₹100" or "Order 2 Masala Dosa"');
+    return;
+  }
+
+  // E. Budget-Aware Reasoning (Under ₹50, ₹100, ₹150)
+  const isBudgetQuery = transcript.includes('under') || transcript.includes('budget') || transcript.includes('sasta') || transcript.includes('deal') || transcript.includes('kam price') || transcript.includes('rupay') || transcript.includes('rs');
+  
+  if (isBudgetQuery && (transcript.includes('50') || transcript.includes('fifty') || transcript.includes('pachaas'))) {
+    addYuluMessage('ai', "💰 **Smart Budget Pick: Under ₹50**\n\nYou've got 2 great choices:\n1️⃣ **Masala Dosa** (₹50) - Crispy golden crepe with spiced potato filling & hot sambar.\n2️⃣ **Vada Pav (2 Pcs) + Hot Masala Chai** (₹30 + ₹15 = **₹45**) — Classic campus combo with ₹5 spare change!", {
+      title: "⚡ Vada Pav (2 Pcs) + Masala Chai Combo",
+      desc: "₹45 Total • 2x Vada Pav + 1x Hot Chai (Saves ₹5 under budget!)",
+      btnText: "⚡ 1-Click Order Combo (₹45)",
+      onClick: () => orderRecommendedCombo(['menu-2', 'menu-10'], 'Vada Pav + Chai Combo')
+    });
+    yuluSpeak("Under 50 rupees, get 2 Vada Pav and a hot Masala Chai for just 45 rupees, or enjoy a fresh Masala Dosa for 50!");
+    updateYuluOrbUI('idle', 'Budget Under ₹50', 'Vada Pav + Chai (₹45) or Masala Dosa (₹50)');
+    return;
+  }
+
+  if (isBudgetQuery && (transcript.includes('100') || transcript.includes('hundred') || transcript.includes('sau'))) {
+    addYuluMessage('ai', "💰 **Top Value Combo: Under ₹100**\n\n✨ **Masala Dosa + Thick Cold Coffee with Ice Cream** (₹50 + ₹50 = **₹100 exactly**)\nA piping hot golden dosa paired with chilled creamy cold coffee & vanilla ice cream. Pure comfort food!\n\n*(Alternate: Cheese Masala Maggi + Sweet Lime Soda for ₹75)*", {
+      title: "⚡ Masala Dosa + Cold Coffee with Ice Cream",
+      desc: "₹100 Total • Crispy Dosa & Rich Chilled Cold Coffee with Ice Cream",
+      btnText: "⚡ 1-Click Order Combo (₹100)",
+      onClick: () => orderRecommendedCombo(['menu-1', 'menu-9'], 'Dosa + Cold Coffee Combo')
+    });
+    yuluSpeak("For 100 rupees, try the Masala Dosa with Thick Cold Coffee and Ice Cream for exactly 100 rupees!");
+    updateYuluOrbUI('idle', 'Best Combo Under ₹100', 'Masala Dosa + Cold Coffee (₹100)');
+    return;
+  }
+
+  if (isBudgetQuery && (transcript.includes('150') || transcript.includes('200') || transcript.includes('budget') || transcript.includes('sasta') || transcript.includes('deal'))) {
+    addYuluMessage('ai', "🍛 **Grand Meal Combo: Under ₹150**\n\n✨ **Paneer Butter Masala Thali + Fresh Sweet Lime Soda** (₹120 + ₹30 = **₹150**)\nFull royal thali: rich paneer gravy, 3 warm butter rotis, aromatic jeera rice, dal tadka, gulab jamun, and a chilled mint lime cooler!", {
+      title: "⚡ Grand Paneer Thali + Lime Soda Combo",
+      desc: "₹150 Total • Full royal thali with refreshing sweet lime cooler",
+      btnText: "⚡ 1-Click Order Thali Combo (₹150)",
+      onClick: () => orderRecommendedCombo(['menu-5', 'menu-11'], 'Paneer Thali + Lime Soda Combo')
+    });
+    yuluSpeak("Under 150 rupees, get the royal Paneer Butter Masala Thali and Fresh Sweet Lime Soda for 150 rupees total.");
+    updateYuluOrbUI('idle', 'Power Thali Under ₹150', 'Paneer Thali + Lime Soda (₹150)');
+    return;
+  }
+
+  // F. Speed & Lecture Rush Reasoning (Dishes < 5 mins)
+  if (transcript.includes('fast') || transcript.includes('quick') || transcript.includes('jaldi') || transcript.includes('5 min') || transcript.includes('5 mins') || transcript.includes('rush') || transcript.includes('lecture') || transcript.includes('class') || transcript.includes('hurry') || transcript.includes('late')) {
+    addYuluMessage('ai', "⏱️ **Fast Express Meals (<5 Mins Prep):**\n\nLate for lecture? These dishes are hot and ready at Counter 2 in under 5 minutes:\n• 🥔 **Mumbai Vada Pav (2 Pcs)** (₹30, 2-3 mins ready)\n• 🥟 **Samosa Pav (2 Pcs)** (₹35, 3-4 mins ready)\n• ☕ **Special Masala Chai** (₹15, instant pour)\n\nZero counter wait time!", {
+      title: "⚡ Speed Express: Mumbai Vada Pav (2 Pcs)",
+      desc: "₹30 • Ready in 2-3 Mins • Quick Counter Pickup",
+      btnText: "⚡ 1-Click Order Fast Snack (₹30)",
+      onClick: () => orderRecommendedCombo(['menu-2'], 'Mumbai Vada Pav')
+    });
+    yuluSpeak("Running late? Mumbai Vada Pav is ready in under 3 minutes at Counter 2 for just 30 rupees.");
+    updateYuluOrbUI('idle', 'Fast Express (<5 mins)', 'Mumbai Vada Pav • 3 mins prep time');
+    return;
+  }
+
+  // G. Fitness, High Protein & Nutrition Reasoning
+  if (transcript.includes('protein') || transcript.includes('gym') || transcript.includes('workout') || transcript.includes('muscle') || transcript.includes('healthy') || transcript.includes('diet') || transcript.includes('calorie') || transcript.includes('low cal') || transcript.includes('light food')) {
+    if (transcript.includes('low cal') || transcript.includes('light') || transcript.includes('halka')) {
+      addYuluMessage('ai', "🥗 **Light & Low-Calorie Meal:**\n\n• **Fresh Sweet Lime Soda** (₹30): Only **~110 kcal**, rich in vitamin C, electrolytes, and zero fat.\n• **Masala Dosa** (₹50): Naturally fermented rice and lentil batter, light on stomach (~280 kcal).", {
+        title: "⚡ Fresh Sweet Lime Soda (Low Cal)",
+        desc: "₹30 • 110 kcal • Mint & Rock Salt Refreshment",
+        btnText: "⚡ 1-Click Order Lime Soda (₹30)",
+        onClick: () => orderRecommendedCombo(['menu-11'], 'Fresh Sweet Lime Soda')
+      });
+      yuluSpeak("For a light calorie choice, Fresh Sweet Lime Soda has only 110 calories with electrolytes for 30 rupees.");
+      updateYuluOrbUI('idle', 'Low Calorie Option', 'Fresh Lime Soda • 110 kcal');
+      return;
+    } else {
+      addYuluMessage('ai', "💪 **Gym & High-Protein Power Meal:**\n\n• 🧀 **Paneer Butter Masala Thali** (₹120): Packed with **~24g Protein** from fresh cottage cheese and dal tadka, accompanied by 3 whole wheat rotis and jeera rice (approx 640 kcal).\n• 🥞 **Masala Dosa** (₹50): Fermented urad dal provides **~9g protein**.\n\nGreat for post-workout muscle recovery!", {
+        title: "⚡ High Protein: Paneer Butter Masala Thali",
+        desc: "₹120 • ~24g Protein • Fresh Paneer, Dal Makhani & Whole Wheat Rotis",
+        btnText: "⚡ 1-Click Order Protein Meal (₹120)",
+        onClick: () => orderRecommendedCombo(['menu-5'], 'Paneer Butter Masala Thali')
+      });
+      yuluSpeak("For high protein, the Paneer Butter Masala Thali packs around 24 grams of protein with whole wheat rotis for 120 rupees.");
+      updateYuluOrbUI('idle', 'High Protein (~24g)', 'Paneer Butter Masala Thali • ₹120');
+      return;
+    }
+  }
+
+  // H. Craving & Mood (Meetha, Thanda, Chai Snack, Spicy)
+  if (transcript.includes('meetha') || transcript.includes('mithai') || transcript.includes('sweet craving')) {
+    addYuluMessage('ai', "🍯 **Sweet Craving Satisfaction:**\n\n• **Hot Gulab Jamun (2 Pcs)** (₹40): Melt-in-mouth milk solids dumplings soaked in warm rose and cardamom syrup.\n• **Thick Cold Coffee with Ice Cream** (₹50): Chilled creamy indulgence topped with rich vanilla scoop!", {
+      title: "⚡ Hot Gulab Jamun (2 Pcs)",
+      desc: "₹40 • Warm Cardamom Scented Syrup Dumplings",
+      btnText: "⚡ 1-Click Order Gulab Jamun (₹40)",
+      onClick: () => orderRecommendedCombo(['menu-12'], 'Hot Gulab Jamun')
+    });
+    yuluSpeak("Satisfy your sweet tooth with warm Hot Gulab Jamun for 40 rupees or Thick Cold Coffee with Ice Cream.");
+    updateYuluOrbUI('idle', 'Sweet Craving', 'Hot Gulab Jamun (2 Pcs) • ₹40');
+    return;
+  }
+
+  if (transcript.includes('thanda') || transcript.includes('pyaas') || transcript.includes('cooler') || transcript.includes('garmi')) {
+    addYuluMessage('ai', "🥤 **Chilled Summer Coolers:**\n\n• **Thick Cold Coffee with Ice Cream** (₹50): Blended espresso with creamy milk and chocolate drizzle.\n• **Fresh Sweet Lime Soda** (₹30): Fizzy limeade with black salt & fresh mint.", {
+      title: "⚡ Thick Cold Coffee with Ice Cream",
+      desc: "₹50 • Chilled espresso shake topped with vanilla ice cream",
+      btnText: "⚡ 1-Click Order Cold Coffee (₹50)",
+      onClick: () => orderRecommendedCombo(['menu-9'], 'Thick Cold Coffee with Ice Cream')
+    });
+    yuluSpeak("Beat the heat with Thick Cold Coffee with Ice Cream for 50 rupees, or Sweet Lime Soda for 30.");
+    updateYuluOrbUI('idle', 'Chilled Coolers', 'Thick Cold Coffee with Ice Cream • ₹50');
+    return;
+  }
+
+  if (transcript.includes('chai snack') || transcript.includes('chai nashta') || transcript.includes('tea snack')) {
+    addYuluMessage('ai', "☕ **Classic Campus Chai & Snack Pairing:**\n\nEnjoy steaming **Special Masala Chai** brewed with crushed ginger & cardamom, paired with **Samosa Pav (2 Pcs)** for just **₹50 total**!", {
+      title: "⚡ Masala Chai + Samosa Pav Combo",
+      desc: "₹50 Total • Hot Masala Chai (₹15) + 2x Crispy Samosa Pav (₹35)",
+      btnText: "⚡ 1-Click Order Combo (₹50)",
+      onClick: () => orderRecommendedCombo(['menu-10', 'menu-3'], 'Chai & Samosa Pav Combo')
+    });
+    yuluSpeak("Nothing beats hot Masala Chai with Samosa Pav for 50 rupees total.");
+    updateYuluOrbUI('idle', 'Chai & Snack Combo', 'Masala Chai + Samosa Pav • ₹50');
+    return;
+  }
+
+  if (transcript.includes('spicy') || transcript.includes('chatpata') || transcript.includes('teekha')) {
+    addYuluMessage('ai', "🔥 **Spicy & Chatpata Campus Favorites:**\n\n• **Cheese Masala Maggi** (₹45): Tossed in hot spicy seasoning with melted cheddar cheese.\n• **Mumbai Vada Pav (2 Pcs)** (₹30): Served with fried salted green chillies & spicy dry garlic chutney!", {
+      title: "⚡ Cheese Masala Maggi (Spicy)",
+      desc: "₹45 • Spicy Veggie Maggi topped with melted cheese",
+      btnText: "⚡ 1-Click Order Maggi (₹45)",
+      onClick: () => orderRecommendedCombo(['menu-8'], 'Cheese Masala Maggi')
+    });
+    yuluSpeak("Try the spicy Cheese Masala Maggi for 45 rupees or Vada Pav with spicy garlic chutney.");
+    updateYuluOrbUI('idle', 'Spicy & Chatpata', 'Cheese Masala Maggi • ₹45');
+    return;
+  }
+
+  // I. Contextual Meal of the Moment & General Recommendations
+  if (transcript.includes('special') || transcript.includes('recommend') || transcript.includes('suggest') || transcript.includes('what should i eat') || transcript.includes('kya khau') || transcript.includes('abhi kya') || transcript.includes('today')) {
+    const curHour = new Date().getHours();
+    if (curHour < 11 || (curHour === 11 && new Date().getMinutes() < 30)) {
+      addYuluMessage('ai', "☀️ **Morning Recommendation:**\n\nStart your morning classes fresh with our crispy **Masala Dosa** (₹50) and piping hot **Special Masala Chai** (₹15)! Freshly ground coconut chutney and hot sambar.", {
+        title: "⚡ Morning Power Combo: Dosa + Chai",
+        desc: "₹65 Total • Crispy Masala Dosa + Hot Ginger Masala Chai",
+        btnText: "⚡ 1-Click Order Combo (₹65)",
+        onClick: () => orderRecommendedCombo(['menu-1', 'menu-10'], 'Dosa + Chai Combo')
+      });
+      yuluSpeak("Good morning! I recommend starting with our hot Masala Dosa and Special Masala Chai.");
+      updateYuluOrbUI('idle', 'Morning Recommendation', 'Masala Dosa + Masala Chai (₹65)');
+      return;
+    } else if (curHour >= 11 && curHour < 16) {
+      addYuluMessage('ai', "🍛 **Lunch Rush Recommendation:**\n\nFor a wholesome lunch, the chef's signature is the **Paneer Butter Masala Thali** (₹120) or fragrant **Special Veg Dum Biryani** (₹110) with chilled raita!", {
+        title: "⚡ Chef Special: Paneer Butter Masala Thali",
+        desc: "₹120 • Rich Gravy, 3 Rotis, Jeera Rice, Dal Tadka & Dessert",
+        btnText: "⚡ 1-Click Order Thali (₹120)",
+        onClick: () => orderRecommendedCombo(['menu-5'], 'Paneer Butter Masala Thali')
+      });
+      yuluSpeak("For lunch, our Chef Special Paneer Butter Masala Thali is hot and ready at Counter 2!");
+      updateYuluOrbUI('idle', 'Lunch Recommendation', 'Paneer Butter Masala Thali • ₹120');
+      return;
+    } else if (curHour >= 16 && curHour < 19) {
+      addYuluMessage('ai', "🥪 **Evening Snack Recommendation:**\n\nPost-lecture break! Grab a comforting plate of **Cheese Masala Maggi** (₹45) with a glass of **Thick Cold Coffee** (₹50)!", {
+        title: "⚡ Evening Combo: Maggi + Cold Coffee",
+        desc: "₹95 Total • Cheesy Masala Maggi & Chilled Cold Coffee with Ice Cream",
+        btnText: "⚡ 1-Click Order Combo (₹95)",
+        onClick: () => orderRecommendedCombo(['menu-8', 'menu-9'], 'Maggi + Cold Coffee')
+      });
+      yuluSpeak("For evening snack, Cheese Masala Maggi with Thick Cold Coffee is the campus student favorite!");
+      updateYuluOrbUI('idle', 'Snack Recommendation', 'Cheese Maggi + Cold Coffee (₹95)');
+      return;
+    } else {
+      addYuluMessage('ai', "🌙 **Dinner Recommendation:**\n\nWrap up your day with our aromatic **Special Veg Dum Biryani** (₹110) served with cucumber raita, followed by warm **Gulab Jamun** (₹40)!", {
+        title: "⚡ Dinner Pick: Special Veg Dum Biryani",
+        desc: "₹110 • Aromatic Dum Biryani with Veggies & Cucumber Raita",
+        btnText: "⚡ 1-Click Order Biryani (₹110)",
+        onClick: () => orderRecommendedCombo(['menu-6'], 'Veg Dum Biryani')
+      });
+      yuluSpeak("For dinner, Special Veg Dum Biryani with chilled raita is a fantastic choice!");
+      updateYuluOrbUI('idle', 'Dinner Recommendation', 'Special Veg Dum Biryani • ₹110');
+      return;
+    }
   }
 
   // 6. Category Browsing

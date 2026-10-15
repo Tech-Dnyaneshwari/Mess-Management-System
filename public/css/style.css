@@ -3588,6 +3588,58 @@ input:checked + .slider:before { transform: translateX(20px); }
   color: #fff;
 }
 
+/* AI Smart Recommendation Action Card inside Chat */
+.yulu-smart-action-card {
+  margin-top: 0.65rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.ysac-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ysac-desc {
+  font-size: 0.74rem;
+  color: #cbd5e1;
+  line-height: 1.35;
+}
+
+.ysac-order-btn {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.4));
+  border: 1px solid var(--accent-cyan);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 0.38rem 0.75rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: all var(--transition-fast);
+  margin-top: 0.2rem;
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.25);
+}
+
+.ysac-order-btn:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.5), rgba(59, 130, 246, 0.6));
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.45);
+  transform: translateY(-1px);
+}
+
 /* Quick Action Chips */
 .yulu-chips-wrapper {
   padding: 0.5rem 1.25rem;
