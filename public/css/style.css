@@ -3076,88 +3076,238 @@ input:checked + .slider:before { transform: translateX(20px); }
   color: #e0f2fe;
 }
 
-/* Voice Assistant HUD Modal Overlay */
-.voice-assistant-overlay {
+/* ==============================================================
+   ULTRA-PREMIUM FLOATING YULU AI COPILOT DOCK & TRIGGER STYLING
+   ============================================================== */
+
+/* Persistent Floating Trigger Button (Bottom-Right) */
+.yulu-floating-wrap {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(3, 7, 18, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  z-index: 10000;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 9998;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 1.25rem;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.28s ease, visibility 0.28s ease;
+  gap: 0.85rem;
 }
 
-.voice-assistant-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.voice-assistant-card {
-  background: linear-gradient(145deg, rgba(15, 23, 58, 0.95) 0%, rgba(10, 16, 40, 0.98) 100%);
-  border: 1px solid var(--border-glow);
-  border-radius: var(--radius-lg);
-  max-width: 540px;
-  width: 100%;
-  padding: 1.8rem 2rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(6, 182, 212, 0.25);
-  transform: scale(0.92) translateY(20px);
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  gap: 1.4rem;
-}
-
-.voice-assistant-overlay.active .voice-assistant-card {
-  transform: scale(1) translateY(0);
-}
-
-.vac-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 0.95rem;
-}
-
-.vac-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--accent-cyan);
-  background: rgba(6, 182, 212, 0.12);
-  padding: 0.3rem 0.8rem;
+.yulu-speech-tooltip {
+  background: rgba(10, 16, 40, 0.92);
+  border: 1px solid var(--accent-cyan);
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+  backdrop-filter: blur(12px);
+  padding: 0.45rem 0.95rem;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(6, 182, 212, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  animation: floatTooltip 3s ease-in-out infinite alternate;
+  transition: all var(--transition-fast);
 }
 
-.vac-dot-pulse {
-  width: 8px;
-  height: 8px;
+.yulu-speech-tooltip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(6, 182, 212, 0.5);
+}
+
+@keyframes floatTooltip {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+
+.yst-pulse {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--accent-cyan);
-  box-shadow: 0 0 10px var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
   animation: pulseDot 1.4s infinite;
 }
 
-.vac-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.yst-text {
+  font-size: 0.78rem;
+  color: #e0f2fe;
 }
 
-.vac-btn-icon {
+.yst-text strong {
+  color: #38bdf8;
+  font-weight: 800;
+}
+
+.yulu-floating-trigger-btn {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 50%, #7c3aed 100%);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.5), 0 0 20px rgba(6, 182, 212, 0.4);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yulu-floating-trigger-btn:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 12px 35px rgba(37, 99, 235, 0.65), 0 0 30px rgba(6, 182, 212, 0.6);
+}
+
+.yulu-floating-trigger-btn:active {
+  transform: scale(0.95);
+}
+
+.yulu-trigger-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px dashed rgba(56, 189, 248, 0.6);
+  animation: spinRing 12s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.yulu-trigger-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+}
+
+.yulu-trigger-avatar {
+  font-size: 1.85rem;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.yulu-trigger-status-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--accent-emerald);
+  border: 2px solid #0a1028;
+  box-shadow: 0 0 8px var(--accent-emerald);
+}
+
+/* Floating Cybernetic Copilot Dock Card */
+.yulu-copilot-card {
+  position: fixed;
+  bottom: 6.2rem;
+  right: 2rem;
+  width: 420px;
+  max-width: calc(100vw - 2.5rem);
+  height: 600px;
+  max-height: calc(100vh - 8rem);
+  background: linear-gradient(165deg, rgba(14, 22, 54, 0.97) 0%, rgba(9, 14, 38, 0.98) 100%);
+  border: 1.5px solid rgba(6, 182, 212, 0.38);
+  border-radius: 24px;
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.75), 0 0 35px rgba(6, 182, 212, 0.22);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(24px) scale(0.94);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yulu-copilot-card.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* Header */
+.yulu-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.15rem 1.35rem;
+  background: rgba(10, 16, 40, 0.75);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yulu-brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.yulu-avatar-glow {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3));
+  border: 1.5px solid var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.4);
+}
+
+.yulu-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.yulu-name {
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.yulu-ai-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.03em;
+}
+
+.yulu-status-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 0.15rem;
+}
+
+.yulu-online-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  box-shadow: 0 0 6px var(--accent-emerald);
+}
+
+.yulu-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.yulu-btn-icon {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--text-muted);
@@ -3167,212 +3317,443 @@ input:checked + .slider:before { transform: translateX(20px); }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.vac-btn-icon:hover {
-  background: rgba(255, 255, 255, 0.15);
+.yulu-btn-icon:hover {
+  background: rgba(255, 255, 255, 0.16);
   color: #fff;
+  transform: translateY(-1px);
 }
 
-/* Visualizer Area */
-.vac-visualizer-area {
+.yulu-close-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
+/* Siri / Gemini Live Dynamic Visualizer Bar */
+.yulu-visualizer-bar {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: 0.8rem 0;
+  gap: 0.95rem;
+  padding: 0.85rem 1.25rem;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.vac-orb {
+.yulu-orb-container {
+  flex-shrink: 0;
+}
+
+.yulu-orb-core {
   position: relative;
-  width: 96px;
-  height: 96px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(59, 130, 246, 0.15) 70%, transparent 100%);
-  border: 2px solid var(--accent-cyan);
-  box-shadow: 0 0 25px rgba(6, 182, 212, 0.5), inset 0 0 20px rgba(6, 182, 212, 0.3);
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(37, 99, 235, 0.2) 70%, transparent 100%);
+  border: 1.5px solid var(--accent-cyan);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.25rem;
   transition: all 0.3s ease;
 }
 
-.vac-orb.listening {
-  animation: orbPulse 1.8s infinite ease-in-out;
+.yulu-orb-core.listening {
   border-color: #38bdf8;
-  box-shadow: 0 0 40px rgba(56, 189, 248, 0.7), inset 0 0 25px rgba(56, 189, 248, 0.4);
+  animation: orbPulse 1.6s infinite ease-in-out;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.8);
 }
 
-.vac-orb.processing {
+.yulu-orb-core.processing {
   border-color: var(--accent-emerald);
-  box-shadow: 0 0 35px rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.7);
 }
 
-@keyframes orbPulse {
-  0% { transform: scale(0.97); }
-  50% { transform: scale(1.06); }
-  100% { transform: scale(0.97); }
-}
-
-.vac-orb-icon {
-  font-size: 2.2rem;
-  z-index: 2;
-}
-
-/* Animated Sound Wave Bars */
-.vac-waves {
+.yulu-orb-soundwaves {
   position: absolute;
   display: flex;
   align-items: center;
-  gap: 4px;
-  height: 36px;
-  opacity: 0.6;
+  gap: 2.5px;
+  height: 24px;
 }
 
-.wave-bar {
-  width: 3.5px;
-  height: 12px;
+.ysw-bar {
+  width: 2.5px;
+  height: 6px;
   background-color: var(--accent-cyan);
   border-radius: 2px;
   transition: height 0.15s ease;
 }
 
-.vac-orb.listening .wave-bar:nth-child(1) { animation: waveDance 0.8s infinite 0.1s; }
-.vac-orb.listening .wave-bar:nth-child(2) { animation: waveDance 0.8s infinite 0.3s; }
-.vac-orb.listening .wave-bar:nth-child(3) { animation: waveDance 0.8s infinite 0.0s; }
-.vac-orb.listening .wave-bar:nth-child(4) { animation: waveDance 0.8s infinite 0.4s; }
-.vac-orb.listening .wave-bar:nth-child(5) { animation: waveDance 0.8s infinite 0.2s; }
+.yulu-orb-core.listening .ysw-bar:nth-child(1) { animation: waveDance 0.7s infinite 0.1s; }
+.yulu-orb-core.listening .ysw-bar:nth-child(2) { animation: waveDance 0.7s infinite 0.3s; }
+.yulu-orb-core.listening .ysw-bar:nth-child(3) { animation: waveDance 0.7s infinite 0.0s; }
+.yulu-orb-core.listening .ysw-bar:nth-child(4) { animation: waveDance 0.7s infinite 0.4s; }
+.yulu-orb-core.listening .ysw-bar:nth-child(5) { animation: waveDance 0.7s infinite 0.2s; }
+.yulu-orb-core.listening .ysw-bar:nth-child(6) { animation: waveDance 0.7s infinite 0.35s; }
+.yulu-orb-core.listening .ysw-bar:nth-child(7) { animation: waveDance 0.7s infinite 0.15s; }
 
-@keyframes waveDance {
-  0%, 100% { height: 10px; opacity: 0.4; }
-  50% { height: 34px; opacity: 1; }
+.yulu-orb-glyph {
+  font-size: 1.15rem;
+  z-index: 2;
 }
 
-.vac-status-text {
-  font-size: 1.22rem;
-  font-weight: 800;
+.yulu-live-headline-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.yulu-live-headline {
+  font-size: 0.86rem;
+  font-weight: 700;
   color: #fff;
-  letter-spacing: -0.01em;
-  margin-bottom: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.vac-transcript-box {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1.15rem;
+.yulu-live-subtext {
+  font-size: 0.72rem;
   color: #94a3b8;
-  font-size: 0.92rem;
-  font-style: italic;
-  max-width: 440px;
-  width: 100%;
-  min-height: 48px;
+  margin-top: 0.15rem;
+}
+
+.yulu-live-subtext em {
+  color: var(--accent-cyan);
+  font-style: normal;
+}
+
+/* Staged Order Bar (1-Click Auto Checkout) */
+.yulu-order-staging-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.22) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  margin: 0.65rem 1.15rem 0;
+  padding: 0.65rem 0.95rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+  animation: fadeIn 0.25s ease;
+}
+
+.yosb-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.yosb-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--accent-emerald);
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.yosb-items {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yosb-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.15rem;
+}
+
+.yosb-price {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #6ee7b7;
+}
+
+.yosb-slot {
+  font-size: 0.72rem;
+  color: #cbd5e1;
+}
+
+.yosb-order-btn {
+  background: linear-gradient(135deg, #059669, #10b981);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
   transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
-.vac-transcript-box.has-speech {
-  color: #e0f2fe;
-  font-style: normal;
-  border-color: var(--accent-cyan);
-  background: rgba(6, 182, 212, 0.08);
+.yosb-order-btn:hover {
+  background: linear-gradient(135deg, #047857, #059669);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.6);
 }
 
-/* Suggestion Chips */
-.vac-suggestions-wrap {
+/* Conversation Chat Feed */
+.yulu-chat-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-}
-
-.vac-suggestions-label {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.vac-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  max-height: 130px;
-  overflow-y: auto;
+  gap: 0.85rem;
   scrollbar-width: thin;
 }
 
-.vac-chip {
+.yulu-msg {
+  display: flex;
+  gap: 0.65rem;
+  max-width: 90%;
+  animation: fadeIn 0.22s ease;
+}
+
+.yulu-msg-ai {
+  align-self: flex-start;
+}
+
+.yulu-msg-user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.ym-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.yulu-msg-user .ym-avatar {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: var(--primary);
+}
+
+.ym-bubble {
+  background: rgba(16, 24, 58, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  border-top-left-radius: 4px;
+  padding: 0.65rem 0.95rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.yulu-msg-user .ym-bubble {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(59, 130, 246, 0.25));
+  border-color: rgba(59, 130, 246, 0.45);
+  border-radius: 16px;
+  border-top-right-radius: 4px;
+}
+
+.ym-author {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.03em;
+}
+
+.yulu-msg-user .ym-author {
+  color: #93c5fd;
+  text-align: right;
+}
+
+.ym-text {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #e2e8f0;
+}
+
+.ym-text strong {
+  color: #fff;
+}
+
+/* Quick Action Chips */
+.yulu-chips-wrapper {
+  padding: 0.5rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.yulu-chips-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.yulu-chips-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.yulu-chip {
   background: rgba(16, 23, 53, 0.85);
   border: 1px solid var(--border-card);
   color: #cbd5e1;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 600;
-  padding: 0.38rem 0.85rem;
+  padding: 0.32rem 0.75rem;
   border-radius: var(--radius-full);
   cursor: pointer;
+  white-space: nowrap;
   transition: all var(--transition-fast);
 }
 
-.vac-chip:hover {
-  background: rgba(37, 99, 235, 0.3);
+.yulu-chip:hover {
+  background: rgba(37, 99, 235, 0.35);
   border-color: var(--primary);
   color: #fff;
   transform: translateY(-1px);
 }
 
-/* Footer Controls */
-.vac-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 0.95rem;
-  flex-wrap: wrap;
+.yulu-chip-primary {
+  background: rgba(6, 182, 212, 0.18);
+  border-color: rgba(6, 182, 212, 0.4);
+  color: #38bdf8;
+  font-weight: 700;
 }
 
-.vac-mic-toggle-btn {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.35));
-  border: 1px solid rgba(239, 68, 68, 0.5);
-  color: #fca5a5;
+/* Footer: Mic + Text Form */
+.yulu-footer-dock {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.25rem 1.15rem;
+  background: rgba(10, 16, 40, 0.85);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yulu-mic-main-btn {
+  position: relative;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(59, 130, 246, 0.35));
+  border: 1.5px solid var(--accent-cyan);
+  color: #fff;
   font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  padding: 0.5rem 1.15rem;
+  padding: 0.48rem 0.95rem;
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.vac-mic-toggle-btn:hover {
-  background: rgba(239, 68, 68, 0.4);
+.yulu-mic-main-btn:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(59, 130, 246, 0.5));
+  box-shadow: 0 6px 18px rgba(6, 182, 212, 0.5);
+  transform: translateY(-1px);
+}
+
+.yulu-mic-main-btn.active-listening {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(220, 38, 38, 0.45));
+  border-color: #f87171;
+  color: #fee2e2;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+.ymm-pulse-ring {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+  animation: pulseDot 1.4s infinite;
+}
+
+.yulu-mic-main-btn.active-listening .ymm-pulse-ring {
+  background-color: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.yulu-text-form {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.yulu-text-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #fff;
+  padding: 0.48rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  transition: all var(--transition-fast);
 }
 
-.vac-mic-toggle-btn.resume-mode {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.35));
-  border-color: rgba(16, 185, 129, 0.5);
-  color: #6ee7b7;
+.yulu-text-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
-.vac-mic-toggle-btn.resume-mode:hover {
-  background: rgba(16, 185, 129, 0.4);
+.yulu-send-btn {
+  background: rgba(59, 130, 246, 0.3);
+  border: 1px solid var(--primary);
   color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  font-size: 0.8rem;
 }
 
-.vac-hint-text {
-  font-size: 0.72rem;
-  color: var(--text-dim);
+.yulu-send-btn:hover {
+  background: var(--primary);
+  transform: scale(1.08);
+}
+
+/* Mobile Responsiveness for Yulu Dock */
+@media (max-width: 520px) {
+  .yulu-floating-wrap {
+    bottom: 1.25rem;
+    right: 1.25rem;
+  }
+  .yulu-speech-tooltip {
+    display: none;
+  }
+  .yulu-copilot-card {
+    right: 1rem;
+    bottom: 4.8rem;
+    width: calc(100vw - 2rem);
+    height: calc(100vh - 6rem);
+    border-radius: 20px;
+  }
 }

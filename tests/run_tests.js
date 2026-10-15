@@ -56,6 +56,17 @@ function assert(condition, testName, details = '') {
   }
 }
 
+async function getAvailableSlot(fallback = '02:00 PM') {
+  try {
+    const r = await request('GET', '/api/slots');
+    if (r.body && Array.isArray(r.body.data)) {
+      const avail = r.body.data.find(s => s.isAvailable && s.remaining > 0);
+      if (avail) return avail.slot;
+    }
+  } catch (e) {}
+  return fallback;
+}
+
 async function runTests() {
   console.log('\n======================================================');
   console.log('🚀 STARTING MESS MANAGEMENT SYSTEM TEST SUITE');
@@ -135,15 +146,16 @@ async function runTests() {
     // TEST 4: A successful order receives a unique token
     // ----------------------------------------------------
     console.log('\n▶ Test 4: Successful order receives unique token...');
+    const slotT4 = await getAvailableSlot('01:45 PM');
     const validOrder = await request('POST', '/api/orders', {
       studentName: 'Aarav Sharma',
       rollNumber: 'CS-2024-099',
-      pickupSlot: '01:00 PM',
+      pickupSlot: slotT4,
       items: [{ id: itemA.id, quantity: 1 }]
     });
     const orderData = validOrder.body.data;
-    assert(validOrder.status === 201 && /^YR-\d+$/.test(orderData.token), 'Order assigned unique token format (e.g. YR-1007)', orderData.token);
-    assert(!!orderData.qrDataUrl && orderData.qrDataUrl.startsWith('data:image/png;base64,'), 'Order generated with valid base64 QR code image');
+    assert(validOrder.status === 201 && /^YR-\d+$/.test(orderData.token), 'Order assigned unique token format (e.g. YR-1007)', orderData ? orderData.token : validOrder.body.message);
+    assert(!!orderData && !!orderData.qrDataUrl && orderData.qrDataUrl.startsWith('data:image/png;base64,'), 'Order generated with valid base64 QR code image');
 
     const qrEndpointRes = await request('GET', `/api/orders/${orderData.token}/qr`);
     assert(qrEndpointRes.status === 200 && qrEndpointRes.body.success === true && !!qrEndpointRes.body.qrDataUrl, 'Dedicated QR code endpoint returns 200 and image');
@@ -191,10 +203,11 @@ async function runTests() {
     // ----------------------------------------------------
     console.log('\n▶ Test 8: Cancellation rejected once food preparation starts...');
     // Create new order and advance to Preparing
+    const slotT8 = await getAvailableSlot('02:00 PM');
     const prepOrderRes = await request('POST', '/api/orders', {
       studentName: 'Late Canceller',
       rollNumber: 'CS-008',
-      pickupSlot: '01:15 PM',
+      pickupSlot: slotT8,
       items: [{ id: itemA.id, quantity: 1 }]
     });
     const prepOrderId = prepOrderRes.body.data.id;
@@ -215,10 +228,11 @@ async function runTests() {
     const initialStock = targetItem.stock;
 
     // Place order for 2 portions
+    const slotT9 = await getAvailableSlot('02:00 PM');
     const cancelableOrder = await request('POST', '/api/orders', {
       studentName: 'Eligible Canceller',
       rollNumber: 'CS-009',
-      pickupSlot: '01:30 PM',
+      pickupSlot: slotT9,
       items: [{ id: itemB.id, quantity: 2 }]
     });
     const cOrderId = cancelableOrder.body.data.id;

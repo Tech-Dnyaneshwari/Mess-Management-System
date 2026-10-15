@@ -201,8 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Custom Dynamic Glow Cursor
   initCustomCursor();
 
-  // Initialize Futuristic Voice Assistant Engine
-  initVoiceAssistant();
+  // Initialize YULU AI Autonomous Voice Order Copilot
+  initYuluCopilot();
 
   // Check URL query parameters for direct QR scan tracking (?track=YR-XXXX)
   const urlParams = new URLSearchParams(window.location.search);
@@ -552,6 +552,11 @@ function updateCartUI() {
 
   // Update drawer contents
   renderCartDrawer(totalAmount);
+
+  // Update Yulu AI Copilot staging bar
+  if (typeof updateYuluStagingBar === 'function') {
+    updateYuluStagingBar(totalAmount);
+  }
 }
 
 function renderCartDrawer(totalAmount) {
@@ -895,7 +900,7 @@ function initCustomCursor() {
   requestAnimationFrame(renderCursor);
 
   // Hover expansion on interactive elements
-  const hoverSelectors = 'button, a, input, select, textarea, .food-card, .chip, .nav-tab, .recent-token-pill, .cart-trigger-btn, .meal-pill-btn, .token-banner-qr, .qr-image-wrapper, .tracker-strip-btn, .voice-search-mic-btn, .vac-chip, .vac-btn-icon, .vac-mic-toggle-btn';
+  const hoverSelectors = 'button, a, input, select, textarea, .food-card, .chip, .nav-tab, .recent-token-pill, .cart-trigger-btn, .meal-pill-btn, .token-banner-qr, .qr-image-wrapper, .tracker-strip-btn, .voice-search-mic-btn, .yulu-floating-trigger-btn, .yulu-speech-tooltip, .yulu-btn-icon, .yulu-chip, .yosb-order-btn, .yulu-mic-main-btn, .yulu-send-btn';
   document.addEventListener('mouseover', (e) => {
     if (e.target.closest(hoverSelectors)) {
       ring.classList.add('cursor-hover');
@@ -1978,39 +1983,45 @@ function showToast(message, type = 'info') {
 }
 
 // ==========================================================================
-// 11. AI VOICE ASSISTANT ENGINE (Web Speech API + Natural Speech Synthesis)
+// 11. YULU AI - AUTONOMOUS VOICE ORDER COPILOT & FLOATING DOCK ENGINE
 // ==========================================================================
 
-const voiceState = {
-  recognition: null,
+const yuluState = {
+  isOpen: false,
   isListening: false,
   isSupported: false,
   speechFeedback: true,
-  isPaused: false
+  isPaused: false,
+  recognition: null,
+  chatHistory: []
 };
 
-function initVoiceAssistant() {
+function initYuluCopilot() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    console.warn('SpeechRecognition API not available in this browser. Fallback simulation enabled.');
-    voiceState.isSupported = false;
+    console.warn('SpeechRecognition API not available in this browser. Fallback text/chip simulation enabled for Yulu AI.');
+    yuluState.isSupported = false;
     return;
   }
 
   try {
-    voiceState.recognition = new SpeechRecognition();
-    voiceState.recognition.continuous = false;
-    voiceState.recognition.interimResults = true;
-    voiceState.recognition.lang = 'en-IN'; // Optimized for Indian English & bilingual terms like Dosa, Pav, etc.
-    voiceState.isSupported = true;
+    yuluState.recognition = new SpeechRecognition();
+    yuluState.recognition.continuous = false;
+    yuluState.recognition.interimResults = true;
+    yuluState.recognition.lang = 'en-IN'; // Indian English + Hindi dish names
+    yuluState.isSupported = true;
 
-    voiceState.recognition.onstart = () => {
-      voiceState.isListening = true;
-      voiceState.isPaused = false;
-      updateVoiceAssistantUIState('listening');
+    yuluState.recognition.onstart = () => {
+      yuluState.isListening = true;
+      yuluState.isPaused = false;
+      updateYuluOrbUI('listening', 'Listening to you...', 'Speak clearly (e.g. "Order 2 Masala Dosa")');
+      const micBtn = document.getElementById('yulu-mic-main-btn');
+      const micText = document.getElementById('yulu-mic-text');
+      if (micBtn) micBtn.classList.add('active-listening');
+      if (micText) micText.innerText = 'Listening...';
     };
 
-    voiceState.recognition.onresult = (event) => {
+    yuluState.recognition.onresult = (event) => {
       let interimTranscript = '';
       let finalTranscript = '';
 
@@ -2022,217 +2033,393 @@ function initVoiceAssistant() {
         }
       }
 
-      const displayTranscript = finalTranscript || interimTranscript;
-      const transcriptBox = document.getElementById('vac-transcript-box');
-      if (transcriptBox && displayTranscript) {
-        transcriptBox.innerText = `"${displayTranscript}"`;
-        transcriptBox.classList.add('has-speech');
+      const display = finalTranscript || interimTranscript;
+      const headline = document.getElementById('yulu-live-headline');
+      if (headline && display) {
+        headline.innerText = `"${display}"`;
       }
 
       if (finalTranscript) {
-        processVoiceCommand(finalTranscript.trim());
+        processYuluCommand(finalTranscript.trim());
       }
     };
 
-    voiceState.recognition.onerror = (event) => {
-      console.warn('Voice recognition event:', event.error);
+    yuluState.recognition.onerror = (event) => {
+      console.warn('Yulu speech recognition event:', event.error);
+      const headline = document.getElementById('yulu-live-headline');
       if (event.error === 'no-speech') {
-        const transcriptBox = document.getElementById('vac-transcript-box');
-        if (transcriptBox) transcriptBox.innerText = '"No speech detected. Tap sample chip or speak clearly."';
+        if (headline) headline.innerText = '"I didn\'t hear anything. Tap mic to speak again."';
       } else if (event.error === 'not-allowed') {
-        showToast('Microphone access blocked. Click any suggestion chip below to test!', 'error');
+        showToast('Microphone access blocked. Click any quick command chip below!', 'error');
       }
-      updateVoiceAssistantUIState('idle');
+      updateYuluOrbUI('idle', 'How can I help you today?', 'Tap mic or click any quick command chip below');
     };
 
-    voiceState.recognition.onend = () => {
-      voiceState.isListening = false;
-      const overlay = document.getElementById('voice-assistant-overlay');
-      if (overlay && overlay.classList.contains('active') && !voiceState.isPaused) {
-        updateVoiceAssistantUIState('idle');
+    yuluState.recognition.onend = () => {
+      yuluState.isListening = false;
+      const micBtn = document.getElementById('yulu-mic-main-btn');
+      const micText = document.getElementById('yulu-mic-text');
+      if (micBtn) micBtn.classList.remove('active-listening');
+      if (micText) micText.innerText = 'Tap to Speak';
+
+      const card = document.getElementById('yulu-copilot-card');
+      if (card && card.classList.contains('active') && !yuluState.isPaused) {
+        updateYuluOrbUI('idle', 'How can I help you today?', 'Say "Order 2 Masala Dosa" or "Place Order"');
       }
     };
   } catch (err) {
-    console.warn('Error setting up SpeechRecognition:', err);
-    voiceState.isSupported = false;
+    console.warn('Error setting up Yulu AI SpeechRecognition:', err);
+    yuluState.isSupported = false;
   }
 }
 
-function openVoiceAssistantModal() {
-  const overlay = document.getElementById('voice-assistant-overlay');
-  if (!overlay) return;
+function toggleYuluCopilot(forceOpen = null) {
+  const card = document.getElementById('yulu-copilot-card');
+  if (!card) return;
 
-  overlay.classList.add('active');
-  updateVoiceAssistantUIState('listening');
+  const shouldOpen = forceOpen !== null ? forceOpen : !card.classList.contains('active');
+  yuluState.isOpen = shouldOpen;
 
-  const transcriptBox = document.getElementById('vac-transcript-box');
-  if (transcriptBox) {
-    transcriptBox.innerText = '"Say \'Add 2 Masala Dosa\' or \'Show Beverages\'..."';
-    transcriptBox.classList.remove('has-speech');
+  if (shouldOpen) {
+    card.classList.add('active');
+    updateYuluStagingBar();
+
+    // Hide tooltip when dock is open
+    const tooltip = document.getElementById('yulu-speech-tooltip');
+    if (tooltip) tooltip.style.display = 'none';
+
+    // Auto-start listening if supported
+    setTimeout(() => {
+      startYuluListening();
+    }, 350);
+  } else {
+    card.classList.remove('active');
+    stopYuluListening();
+
+    const tooltip = document.getElementById('yulu-speech-tooltip');
+    if (tooltip) tooltip.style.display = 'flex';
   }
+}
 
-  // Start speech recognition if supported
-  if (voiceState.isSupported && voiceState.recognition) {
+function startYuluListening() {
+  if (yuluState.isSupported && yuluState.recognition) {
     try {
-      voiceState.recognition.start();
+      yuluState.recognition.start();
     } catch (e) {
-      // Already running
+      // Already active
     }
   } else {
-    const statusText = document.getElementById('vac-status-text');
-    if (statusText) statusText.innerText = 'Voice Assistant Ready (Tap a command)';
+    updateYuluOrbUI('idle', 'Yulu AI Copilot Ready', 'Click any chip or type a command below');
   }
 }
 
-function closeVoiceAssistantModal() {
-  const overlay = document.getElementById('voice-assistant-overlay');
-  if (!overlay) return;
-
-  overlay.classList.remove('active');
-  if (voiceState.recognition && voiceState.isListening) {
+function stopYuluListening() {
+  if (yuluState.recognition && yuluState.isListening) {
     try {
-      voiceState.recognition.stop();
+      yuluState.recognition.stop();
     } catch (e) {}
   }
-  voiceState.isListening = false;
+  yuluState.isListening = false;
 }
 
-function handleVoiceOverlayClick(e) {
-  if (e.target.id === 'voice-assistant-overlay') {
-    closeVoiceAssistantModal();
-  }
-}
-
-function toggleSpeechRecording() {
-  const btnIcon = document.getElementById('vac-mic-btn-icon');
-  const toggleBtn = document.getElementById('vac-mic-toggle-btn');
-
-  if (voiceState.isListening) {
-    voiceState.isPaused = true;
-    if (voiceState.recognition) {
-      try { voiceState.recognition.stop(); } catch (e) {}
-    }
-    voiceState.isListening = false;
-    updateVoiceAssistantUIState('idle');
-    if (btnIcon) btnIcon.innerText = '▶️ Resume Listening';
-    if (toggleBtn) toggleBtn.classList.add('resume-mode');
+function toggleYuluVoiceListening() {
+  if (yuluState.isListening) {
+    yuluState.isPaused = true;
+    stopYuluListening();
+    updateYuluOrbUI('idle', 'Listening paused', 'Tap mic to resume speaking');
   } else {
-    voiceState.isPaused = false;
-    updateVoiceAssistantUIState('listening');
-    if (btnIcon) btnIcon.innerText = '⏹️ Pause Listening';
-    if (toggleBtn) toggleBtn.classList.remove('resume-mode');
-
-    if (voiceState.isSupported && voiceState.recognition) {
-      try { voiceState.recognition.start(); } catch (e) {}
-    }
+    yuluState.isPaused = false;
+    startYuluListening();
   }
 }
 
-function toggleVoiceSpeechFeedback() {
-  voiceState.speechFeedback = !voiceState.speechFeedback;
-  const icon = document.getElementById('vac-mute-icon');
+function toggleYuluSpeechFeedback() {
+  yuluState.speechFeedback = !yuluState.speechFeedback;
+  const icon = document.getElementById('yulu-mute-icon');
   if (icon) {
-    icon.innerText = voiceState.speechFeedback ? '🔊' : '🔇';
+    icon.innerText = yuluState.speechFeedback ? '🔊' : '🔇';
   }
-  showToast(`Voice assistant speech reply ${voiceState.speechFeedback ? 'Enabled' : 'Muted'}`, 'info');
+  showToast(`Yulu voice response ${yuluState.speechFeedback ? 'Enabled 🔊' : 'Muted 🔇'}`, 'info');
 }
 
-function updateVoiceAssistantUIState(uiState) {
-  const orb = document.getElementById('vac-orb');
-  const statusText = document.getElementById('vac-status-text');
+function updateYuluOrbUI(mode, headline, subtext) {
+  const orb = document.getElementById('yulu-orb-core');
+  const hEl = document.getElementById('yulu-live-headline');
+  const sEl = document.getElementById('yulu-live-subtext');
 
-  if (uiState === 'listening') {
-    if (orb) {
-      orb.classList.add('listening');
-      orb.classList.remove('processing');
-    }
-    if (statusText) statusText.innerText = 'Listening... Speak now 🎙️';
-  } else if (uiState === 'processing') {
-    if (orb) {
-      orb.classList.remove('listening');
-      orb.classList.add('processing');
-    }
-    if (statusText) statusText.innerText = 'Processing command... ✨';
-  } else {
-    if (orb) {
-      orb.classList.remove('listening');
-      orb.classList.remove('processing');
-    }
-    if (statusText) statusText.innerText = 'Tap mic or click a suggestion below';
+  if (orb) {
+    orb.classList.remove('listening', 'processing');
+    if (mode === 'listening') orb.classList.add('listening');
+    if (mode === 'processing') orb.classList.add('processing');
   }
+
+  if (hEl && headline) hEl.innerText = headline;
+  if (sEl && subtext) sEl.innerHTML = subtext;
 }
 
-function speakVoiceResponse(text) {
-  if (!voiceState.speechFeedback || !window.speechSynthesis) return;
+function yuluSpeak(text) {
+  if (!yuluState.speechFeedback || !window.speechSynthesis) return;
 
   try {
-    window.speechSynthesis.cancel(); // Stop prior speech
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.05;
-    utterance.pitch = 1.05;
+    utterance.pitch = 1.08;
     utterance.lang = 'en-IN';
     window.speechSynthesis.speak(utterance);
   } catch (err) {
-    console.warn('Speech synthesis warning:', err);
+    console.warn('Yulu speech synthesis warning:', err);
   }
 }
 
-function executeSimulatedVoiceCommand(commandText) {
-  const transcriptBox = document.getElementById('vac-transcript-box');
-  if (transcriptBox) {
-    transcriptBox.innerText = `"${commandText}"`;
-    transcriptBox.classList.add('has-speech');
-  }
+function addYuluMessage(sender, text) {
+  const feed = document.getElementById('yulu-chat-feed');
+  if (!feed) return;
 
-  processVoiceCommand(commandText);
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `yulu-msg yulu-msg-${sender}`;
+
+  const avatar = sender === 'ai' ? '🤖' : '👤';
+  const authorName = sender === 'ai' ? 'Yulu AI' : 'You';
+
+  // Format basic bold markdown **text**
+  const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  msgDiv.innerHTML = `
+    <div class="ym-avatar">${avatar}</div>
+    <div class="ym-bubble">
+      <div class="ym-author">${authorName}</div>
+      <div class="ym-text">${formattedText}</div>
+    </div>
+  `;
+
+  feed.appendChild(msgDiv);
+  feed.scrollTop = feed.scrollHeight;
 }
 
-function processVoiceCommand(rawTranscript) {
+function clearYuluChat() {
+  const feed = document.getElementById('yulu-chat-feed');
+  if (!feed) return;
+  feed.innerHTML = `
+    <div class="yulu-msg yulu-msg-ai">
+      <div class="ym-avatar">🤖</div>
+      <div class="ym-bubble">
+        <div class="ym-author">Yulu AI</div>
+        <div class="ym-text">
+          Conversation cleared. I am ready for your next order! 🚀
+        </div>
+      </div>
+    </div>
+  `;
+  showToast('Yulu chat feed cleared', 'info');
+}
+
+function updateYuluStagingBar(totalAmount = null) {
+  const stagingBar = document.getElementById('yulu-order-staging-bar');
+  const itemsPreview = document.getElementById('yosb-items-preview');
+  const priceEl = document.getElementById('yosb-price');
+  const slotEl = document.getElementById('yosb-slot');
+  if (!stagingBar) return;
+
+  if (state.cart.length === 0) {
+    stagingBar.style.display = 'none';
+    return;
+  }
+
+  stagingBar.style.display = 'flex';
+  const total = totalAmount !== null 
+    ? totalAmount 
+    : state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  if (itemsPreview) {
+    itemsPreview.innerText = state.cart.map(i => `${i.quantity}x ${i.name}`).join(', ');
+  }
+  if (priceEl) {
+    priceEl.innerText = `₹${total}`;
+  }
+  if (slotEl) {
+    slotEl.innerText = '⏰ Auto Slot: Immediate (10-15 mins)';
+  }
+}
+
+// ==========================================================================
+// 12. END-TO-END AUTONOMOUS ORDER EXECUTION ENGINE
+// ==========================================================================
+
+async function executeAutonomousOrder(customSlot = null) {
+  if (state.cart.length === 0) {
+    addYuluMessage('ai', "Your cart is empty right now! Tell me what dish you'd like, for example: *'Order 2 Masala Dosa'* or *'Order Vada Pav'*.");
+    yuluSpeak("Your cart is empty right now. Tell me what dish to order, for example, Order 2 Masala Dosa!");
+    return false;
+  }
+
+  updateYuluOrbUI('processing', '⚡ Booking your meal with kitchen...', 'Submitting automated order and allocating token slot');
+
+  // Determine available pickup slot
+  let chosenSlot = customSlot;
+  if (!chosenSlot) {
+    try {
+      const slotsRes = await fetch('/api/slots').then(r => r.json());
+      if (slotsRes.success && Array.isArray(slotsRes.data)) {
+        const available = slotsRes.data.find(s => s.isAvailable);
+        if (available) chosenSlot = available.slot;
+      }
+    } catch (e) {
+      console.warn('Could not query slots for Yulu auto-order:', e);
+    }
+  }
+  if (!chosenSlot) chosenSlot = 'Immediate (10-15 mins)';
+
+  // Determine student credentials (from fields, localStorage, or smart profile)
+  let studentName = (document.getElementById('student-name')?.value || '').trim();
+  let rollNumber = (document.getElementById('roll-number')?.value || '').trim();
+  let phone = (document.getElementById('student-phone')?.value || '').trim();
+
+  if (!studentName) studentName = localStorage.getItem('yulu_student_name') || 'Aarav Sharma';
+  if (!rollNumber) rollNumber = localStorage.getItem('yulu_student_roll') || 'CS-2024-099';
+  if (!phone) phone = localStorage.getItem('yulu_student_phone') || '9876543210';
+
+  // Save for future 1-click orders
+  localStorage.setItem('yulu_student_name', studentName);
+  localStorage.setItem('yulu_student_roll', rollNumber);
+  localStorage.setItem('yulu_student_phone', phone);
+
+  addYuluMessage('ai', `⚡ Placing automated order for **${studentName}** (${rollNumber}) at slot **${chosenSlot}**...`);
+  yuluSpeak("Placing your order with the mess kitchen now...");
+
+  try {
+    const payload = {
+      studentName,
+      rollNumber,
+      phone,
+      pickupSlot: chosenSlot,
+      items: state.cart.map(c => ({ id: c.id, name: c.name, quantity: c.quantity }))
+    };
+
+    const res = await apiFetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (!data.success) {
+      addYuluMessage('ai', `⚠️ Couldn't complete order: **${data.message}**`);
+      yuluSpeak(`Could not complete order: ${data.message}`);
+      updateYuluOrbUI('idle', 'Order could not be placed', data.message);
+      showToast(data.message, 'error');
+      return false;
+    }
+
+    const createdOrder = data.data;
+
+    // Clear cart & sync UI
+    state.cart = [];
+    saveCart();
+    updateCartUI();
+    loadMenu();
+
+    // Persist token for tracking
+    state.trackingToken = createdOrder.token;
+    saveRecentToken(createdOrder.token);
+
+    // Play celebration chime
+    playCafeteriaChime();
+
+    const itemsSummary = createdOrder.items.map(i => `${i.quantity}x ${i.name}`).join(', ');
+    addYuluMessage('ai', `🎉 **Order Confirmed!**\n\n🎟️ Token: **#${createdOrder.token}**\n🍽️ Meal: **${itemsSummary}**\n⏱️ Pickup Slot: **${createdOrder.pickupSlot}**\n💵 Total: **₹${createdOrder.totalAmount}** (Cash at Pickup)\n\nPresent your token or QR code at Counter 2 to collect your meal!`);
+
+    updateYuluOrbUI('processing', `🎉 Order Placed! Token #${createdOrder.token}`, `Pickup Slot: ${createdOrder.pickupSlot} • Counter 2`);
+    yuluSpeak(`Order placed successfully! Your token number is ${createdOrder.token} for ${createdOrder.pickupSlot}. See you at Counter 2!`);
+    showToast(`🎉 Order Placed! Token #${createdOrder.token}`, 'success');
+
+    // Display confirmation modal
+    setTimeout(() => {
+      showSuccessModal(createdOrder);
+    }, 1200);
+
+    return true;
+  } catch (err) {
+    console.error('Yulu autonomous order error:', err);
+    addYuluMessage('ai', '⚠️ Network error while placing order. Please check your connection.');
+    yuluSpeak('Sorry, I encountered an error while communicating with the mess server.');
+    updateYuluOrbUI('idle', 'Network Error', 'Please try again');
+    return false;
+  }
+}
+
+// ==========================================================================
+// 13. YULU AI CONVERSATIONAL COMMAND PARSER
+// ==========================================================================
+
+function handleYuluChipCommand(cmdText) {
+  processYuluCommand(cmdText);
+}
+
+function handleYuluTextSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById('yulu-text-input');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+  input.value = '';
+  processYuluCommand(val);
+}
+
+function processYuluCommand(rawTranscript) {
   const transcript = rawTranscript.toLowerCase().trim();
-  updateVoiceAssistantUIState('processing');
+  addYuluMessage('user', rawTranscript);
+  updateYuluOrbUI('processing', 'Processing command...', rawTranscript);
 
-  // 1. Check for Cart Actions
-  if (transcript.includes('open cart') || transcript.includes('view cart') || transcript.includes('show cart') || transcript.includes('cart dikhao')) {
-    openCartDrawer();
-    speakVoiceResponse('Opening your cart.');
-    finishVoiceCommand(`Opened Cart (${state.cart.length} items)`);
+  // 1. Direct Autonomous Confirmation / Checkout ("Place order", "Confirm", "Yulu order kardo", "Book it")
+  const isConfirmCommand = 
+    transcript.includes('place order') ||
+    transcript.includes('confirm order') ||
+    transcript.includes('confirm') ||
+    transcript.includes('book order') ||
+    transcript.includes('book my meal') ||
+    transcript.includes('order kardo') ||
+    transcript.includes('order place karo') ||
+    transcript.includes('ha order kardo') ||
+    transcript.includes('complete order');
+
+  if (isConfirmCommand && state.cart.length > 0) {
+    executeAutonomousOrder();
     return;
   }
 
-  if (transcript.includes('close cart')) {
-    closeCartDrawer();
-    speakVoiceResponse('Closing cart.');
-    finishVoiceCommand('Closed Cart');
-    return;
-  }
-
+  // 2. Clear Cart
   if (transcript.includes('clear cart') || transcript.includes('empty cart') || transcript.includes('delete cart')) {
     state.cart = [];
     saveCart();
     updateCartUI();
     renderMenu();
-    speakVoiceResponse('Your cart has been cleared.');
-    finishVoiceCommand('Cart Cleared');
+    addYuluMessage('ai', '🗑️ Your cart has been emptied.');
+    yuluSpeak('I have cleared your cart.');
+    updateYuluOrbUI('idle', 'Cart Cleared', 'Tell me what you would like to eat!');
     return;
   }
 
-  if (transcript.includes('checkout') || transcript.includes('place order')) {
+  // 3. Open / View Cart
+  if (transcript.includes('open cart') || transcript.includes('show cart') || transcript.includes('view cart') || transcript.includes('cart dikhao')) {
     openCartDrawer();
-    openCheckoutModal();
-    speakVoiceResponse('Opening checkout form.');
-    finishVoiceCommand('Opening Checkout Modal');
+    addYuluMessage('ai', `🛒 Cart opened! You have **${state.cart.length} items** staged.`);
+    yuluSpeak('Opening your cart drawer.');
+    updateYuluOrbUI('idle', 'Cart Opened', `Total Amount: ₹${state.cart.reduce((s, i) => s + (i.price * i.quantity), 0)}`);
     return;
   }
 
-  // 2. Check for View Navigation
-  if (transcript.includes('menu') || transcript.includes('food')) {
-    switchView('student');
-    speakVoiceResponse('Showing food menu.');
-    finishVoiceCommand('Navigated to Menu');
+  // 4. Close Cart
+  if (transcript.includes('close cart')) {
+    closeCartDrawer();
+    addYuluMessage('ai', 'Closed your cart drawer.');
+    yuluSpeak('Closing cart.');
+    updateYuluOrbUI('idle', 'Cart Closed', '');
     return;
   }
 
-  if (transcript.includes('track') || transcript.includes('status')) {
+  // 5. Track Order
+  if (transcript.includes('track') || transcript.includes('where is my order') || transcript.includes('status kya hai')) {
     const tokenMatch = transcript.match(/(?:yr-?)?(\d{4})/i);
     switchView('tracking');
     if (tokenMatch) {
@@ -2240,73 +2427,77 @@ function processVoiceCommand(rawTranscript) {
       const trackInput = document.getElementById('tracking-token-input');
       if (trackInput) trackInput.value = fullToken;
       lookupOrderByToken(fullToken);
-      speakVoiceResponse(`Tracking order token ${fullToken}.`);
-      finishVoiceCommand(`Tracking Token #${fullToken}`);
+      addYuluMessage('ai', `📍 Tracking order token **#${fullToken}** in real time!`);
+      yuluSpeak(`Tracking token ${fullToken}.`);
+    } else if (state.trackingToken) {
+      lookupOrderByToken(state.trackingToken);
+      addYuluMessage('ai', `📍 Tracking your recent order token **#${state.trackingToken}**!`);
+      yuluSpeak(`Tracking your recent order ${state.trackingToken}.`);
     } else {
-      speakVoiceResponse('Opening live order tracker.');
-      finishVoiceCommand('Navigated to Live Tracker');
+      addYuluMessage('ai', '📍 Opened the Live Meal Status Tracker!');
+      yuluSpeak('Opening your live order tracker.');
     }
+    updateYuluOrbUI('idle', 'Live Tracker Active', 'Showing real-time kitchen pipeline');
     return;
   }
 
-  if (transcript.includes('review') || transcript.includes('feedback') || transcript.includes('rating')) {
-    switchView('feedback');
-    speakVoiceResponse('Viewing ratings and reviews.');
-    finishVoiceCommand('Navigated to Reviews');
-    return;
-  }
-
-  // 3. Check for Category Filter
+  // 6. Category Browsing
   if (transcript.includes('breakfast') || transcript.includes('nashta')) {
     switchView('student');
     filterByCategory('Breakfast');
-    speakVoiceResponse('Showing breakfast specials.');
-    finishVoiceCommand('Filtered: Breakfast Specials');
+    addYuluMessage('ai', "🥞 Displaying fresh **Breakfast Specials** (Dosa, Idli, Upma, Paratha).");
+    yuluSpeak("Showing today's breakfast specials.");
+    updateYuluOrbUI('idle', 'Breakfast Specials', 'Click any dish to add or say "Order 2 Masala Dosa"');
     return;
   }
 
-  if ((transcript.includes('snack') || transcript.includes('chaat')) && !transcript.includes('add')) {
+  if ((transcript.includes('snack') || transcript.includes('chaat')) && !transcript.includes('add') && !transcript.includes('order')) {
     switchView('student');
     filterByCategory('Snacks');
-    speakVoiceResponse('Showing delicious snacks.');
-    finishVoiceCommand('Filtered: Snacks');
+    addYuluMessage('ai', "🥪 Displaying crispy **Snacks & Chaat** (Vada Pav, Samosa, Grilled Sandwiches).");
+    yuluSpeak("Showing tasty snacks and chaat.");
+    updateYuluOrbUI('idle', 'Snacks & Quick Bites', 'Freshly fried and prepared');
     return;
   }
 
-  if (transcript.includes('meal') || transcript.includes('thali') && !transcript.includes('add') || transcript.includes('lunch') || transcript.includes('dinner')) {
+  if ((transcript.includes('meal') || transcript.includes('thali') || transcript.includes('lunch') || transcript.includes('dinner')) && !transcript.includes('add') && !transcript.includes('order')) {
     switchView('student');
     filterByCategory('Meals');
-    speakVoiceResponse('Showing meals and thali dishes.');
-    finishVoiceCommand('Filtered: Meals & Thali');
+    addYuluMessage('ai', "🍛 Displaying wholesome **Meals & Special Thalis**.");
+    yuluSpeak("Showing wholesome mess meals and thali.");
+    updateYuluOrbUI('idle', 'Meals & Thali', 'Cooked fresh for your pickup slot');
     return;
   }
 
-  if ((transcript.includes('beverage') || transcript.includes('drink')) && !transcript.includes('add')) {
+  if ((transcript.includes('beverage') || transcript.includes('drink')) && !transcript.includes('add') && !transcript.includes('order')) {
     switchView('student');
     filterByCategory('Beverages');
-    speakVoiceResponse('Showing beverages and drinks.');
-    finishVoiceCommand('Filtered: Beverages');
+    addYuluMessage('ai', "☕ Displaying refreshing **Beverages** (Cold Coffee, Masala Chai, Fresh Juices).");
+    yuluSpeak("Showing hot and cold beverages.");
+    updateYuluOrbUI('idle', 'Beverages & Drinks', 'Chai, Coffee & Refreshing Coolers');
     return;
   }
 
-  if (transcript.includes('dessert') || transcript.includes('sweet') || transcript.includes('mithai') || transcript.includes('ice cream')) {
+  if (transcript.includes('dessert') || transcript.includes('sweet') || transcript.includes('mithai')) {
     switchView('student');
     filterByCategory('Desserts');
-    speakVoiceResponse('Showing desserts.');
-    finishVoiceCommand('Filtered: Desserts');
+    addYuluMessage('ai', "🍨 Displaying sweet **Desserts**.");
+    yuluSpeak("Showing desserts and sweets.");
+    updateYuluOrbUI('idle', 'Desserts', 'Gulab Jamun, Pastries & Ice Cream');
     return;
   }
 
-  if (transcript.includes('all') || transcript.includes('full menu') || transcript.includes('everything')) {
+  if (transcript.includes('all items') || transcript.includes('full menu') || transcript.includes('everything')) {
     switchView('student');
     filterByCategory('All');
     clearSearch();
-    speakVoiceResponse('Showing all menu items.');
-    finishVoiceCommand('Filtered: All Items');
+    addYuluMessage('ai', "🍽️ Displaying the **Full Campus Mess Menu**.");
+    yuluSpeak("Showing all items on the menu.");
+    updateYuluOrbUI('idle', 'Full Mess Menu', 'All categories available');
     return;
   }
 
-  // 4. Check for Adding Items ("Add 2 Masala Dosa", "Add Vada Pav", "Ek Chai add karo")
+  // 7. Check for Adding or 1-Shot Ordering Dishes ("Order 2 Masala Dosa", "Add Vada Pav", "Ek Chai order kardo")
   let quantity = 1;
   const numMap = {
     'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
@@ -2347,11 +2538,13 @@ function processVoiceCommand(rawTranscript) {
   if (matchedItem) {
     switchView('student');
     if (!matchedItem.isAvailable || matchedItem.stock <= 0) {
-      speakVoiceResponse(`Sorry, ${matchedItem.name} is currently sold out.`);
-      finishVoiceCommand(`Sold Out: ${matchedItem.name}`);
+      addYuluMessage('ai', `⚠️ Sorry, **${matchedItem.name}** is currently sold out.`);
+      yuluSpeak(`Sorry, ${matchedItem.name} is currently out of stock.`);
+      updateYuluOrbUI('idle', 'Item Sold Out', `${matchedItem.name} is out of stock`);
       return;
     }
 
+    // Add item with parsed quantity
     addToCart(matchedItem.id);
     if (quantity > 1) {
       for (let q = 1; q < quantity; q++) {
@@ -2359,34 +2552,38 @@ function processVoiceCommand(rawTranscript) {
       }
     }
 
-    speakVoiceResponse(`Added ${quantity > 1 ? quantity + ' ' : ''}${matchedItem.name} to your cart.`);
-    finishVoiceCommand(`✅ Added ${quantity}× ${matchedItem.name} to Cart`);
-    showToast(`Added ${quantity}× ${matchedItem.name} to Cart via Voice 🎙️`, 'success');
-    return;
+    // Check if user explicitly said "order" / "book" / "place" (1-Shot Autonomous Flow)
+    const isDirectOrderIntent = 
+      transcript.startsWith('order') || 
+      transcript.startsWith('book') || 
+      transcript.includes('order kardo') || 
+      transcript.includes('book kardo') ||
+      transcript.includes('and place order') ||
+      transcript.includes('and checkout');
+
+    if (isDirectOrderIntent) {
+      addYuluMessage('ai', `⚡ 1-Shot Voice Order detected! Added **${quantity}x ${matchedItem.name}** (₹${matchedItem.price * quantity}). Placing order now...`);
+      executeAutonomousOrder();
+      return;
+    } else {
+      // Regular addition flow with quick confirmation staging
+      const totalCart = state.cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+      addYuluMessage('ai', `✅ Added **${quantity}x ${matchedItem.name}** to your cart (Total: ₹${totalCart}).\n\nSay **"Place Order"** or tap the green button below to generate your token!`);
+      yuluSpeak(`Added ${quantity > 1 ? quantity + ' ' : ''}${matchedItem.name} to your cart. Total is ₹${totalCart}. Say Confirm or tap Place Order to book your meal!`);
+      updateYuluOrbUI('idle', `Added ${quantity}x ${matchedItem.name}`, `Cart Total: ₹${totalCart} • Say "Place Order" to confirm`);
+      return;
+    }
   }
 
-  // 5. Default Fallback: Treat as Search
+  // 8. Search Fallback
   switchView('student');
-  const cleanSearch = transcript.replace(/search|find|show|look for|dhundo/gi, '').trim();
+  const cleanSearch = transcript.replace(/search|find|show|look for|dhundo|yulu/gi, '').trim();
   const searchInput = document.getElementById('menu-search-input');
-  if (searchInput) {
+  if (searchInput && cleanSearch) {
     searchInput.value = cleanSearch;
     handleMenuSearch();
   }
-  speakVoiceResponse(`Searching for ${cleanSearch}.`);
-  finishVoiceCommand(`🔍 Searched: "${cleanSearch}"`);
-}
-
-function finishVoiceCommand(statusMessage) {
-  const statusText = document.getElementById('vac-status-text');
-  const orb = document.getElementById('vac-orb');
-  if (statusText) statusText.innerText = statusMessage;
-  if (orb) {
-    orb.classList.remove('listening');
-    orb.classList.add('processing');
-  }
-
-  setTimeout(() => {
-    closeVoiceAssistantModal();
-  }, 1700);
+  addYuluMessage('ai', `🔍 Searched the menu for **"${cleanSearch}"**.`);
+  yuluSpeak(`Searching for ${cleanSearch}.`);
+  updateYuluOrbUI('idle', `Search: "${cleanSearch}"`, 'Check matching dishes on screen');
 }

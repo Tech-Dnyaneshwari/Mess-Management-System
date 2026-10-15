@@ -176,10 +176,10 @@
           </svg>
           <input type="text" id="menu-search-input" class="search-input" placeholder="Search delicious snacks, meals, dosa, coffee..." oninput="handleMenuSearch()">
           <button class="search-clear-btn" id="search-clear-btn" onclick="clearSearch()" style="display: none;">✕</button>
-          <button class="voice-search-mic-btn" id="voice-search-mic-btn" onclick="openVoiceAssistantModal()" title="Voice Assistant & Order by Voice (Click to speak)">
+          <button class="voice-search-mic-btn" id="voice-search-mic-btn" onclick="toggleYuluCopilot()" title="Open Yulu AI Voice Copilot & Order Assistant">
             <span class="mic-wave-pulse"></span>
-            <span class="mic-icon-glyph">🎙️</span>
-            <span class="mic-text-badge">Voice Order</span>
+            <span class="mic-icon-glyph">🤖</span>
+            <span class="mic-text-badge">Yulu AI</span>
           </button>
         </div>
 
@@ -1098,58 +1098,145 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- FUTURISTIC AI VOICE ASSISTANT HUD MODAL                        -->
+  <!-- FLOATING ULTRA-PREMIUM YULU AI COPILOT DOCK & TRIGGER          -->
   <!-- ============================================================== -->
-  <div class="voice-assistant-overlay" id="voice-assistant-overlay" onclick="handleVoiceOverlayClick(event)">
-    <div class="voice-assistant-card" id="voice-assistant-card">
-      <div class="vac-header">
-        <div class="vac-badge">
-          <span class="vac-dot-pulse"></span>
-          <span>CAMPUS MESS AI VOICE ASSISTANT</span>
-        </div>
-        <div class="vac-header-actions">
-          <button class="vac-btn-icon" id="vac-voice-mute-btn" onclick="toggleVoiceSpeechFeedback()" title="Toggle voice speech reply">
-            <span id="vac-mute-icon">🔊</span>
-          </button>
-          <button class="vac-btn-icon" onclick="closeVoiceAssistantModal()" title="Close voice assistant">✕</button>
-        </div>
-      </div>
 
-      <div class="vac-visualizer-area">
-        <div class="vac-orb" id="vac-orb">
-          <div class="vac-waves" id="vac-waves">
-            <span class="wave-bar"></span>
-            <span class="wave-bar"></span>
-            <span class="wave-bar"></span>
-            <span class="wave-bar"></span>
-            <span class="wave-bar"></span>
+  <!-- Persistent Floating Trigger Button (Bottom-Right) -->
+  <div class="yulu-floating-wrap" id="yulu-floating-wrap">
+    <div class="yulu-speech-tooltip" id="yulu-speech-tooltip" onclick="toggleYuluCopilot()">
+      <span class="yst-pulse"></span>
+      <span class="yst-text">⚡ Hey, Order with <strong>Yulu AI</strong></span>
+    </div>
+    <button class="yulu-floating-trigger-btn" id="yulu-floating-trigger" onclick="toggleYuluCopilot()" title="Talk to Yulu AI (Autonomous Voice Order Copilot)">
+      <div class="yulu-trigger-ring"></div>
+      <div class="yulu-trigger-glow"></div>
+      <span class="yulu-trigger-avatar">🤖</span>
+      <span class="yulu-trigger-status-dot"></span>
+    </button>
+  </div>
+
+  <!-- Floating Cybernetic Yulu Copilot Card Dock -->
+  <div class="yulu-copilot-card" id="yulu-copilot-card">
+    <!-- Header -->
+    <div class="yulu-card-header">
+      <div class="yulu-brand-wrap">
+        <div class="yulu-avatar-glow">🤖</div>
+        <div class="yulu-brand-text">
+          <div class="yulu-title-row">
+            <span class="yulu-name">YULU AI</span>
+            <span class="yulu-ai-badge">Autonomous Copilot</span>
           </div>
-          <div class="vac-orb-icon" id="vac-orb-icon">🎙️</div>
-        </div>
-        <h3 class="vac-status-text" id="vac-status-text">Listening... Speak now</h3>
-        <div class="vac-transcript-box" id="vac-transcript-box">"Say 'Add 2 Masala Dosa' or 'Show Beverages'..."</div>
-      </div>
-
-      <div class="vac-suggestions-wrap">
-        <span class="vac-suggestions-label">Try speaking or tap any command:</span>
-        <div class="vac-chips">
-          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Add Masala Dosa')">🥞 "Add Masala Dosa"</button>
-          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Add 2 Vada Pav')">🥪 "Add 2 Vada Pav"</button>
-          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Show Beverages')">☕ "Show Beverages"</button>
-          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Show Breakfast')">🥞 "Show Breakfast"</button>
-          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Open Cart')">🛒 "Open Cart"</button>
-          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Show All Items')">🍽️ "Show All Items"</button>
-          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Track YR-1001')">📍 "Track YR-1001"</button>
-          <button class="vac-chip" onclick="executeSimulatedVoiceCommand('Clear Cart')">🗑️ "Clear Cart"</button>
+          <span class="yulu-status-sub">
+            <span class="yulu-online-dot"></span>
+            <span id="yulu-mode-label">Voice Ordering Active</span>
+          </span>
         </div>
       </div>
 
-      <div class="vac-footer">
-        <button class="vac-mic-toggle-btn" id="vac-mic-toggle-btn" onclick="toggleSpeechRecording()">
-          <span id="vac-mic-btn-icon">⏹️ Pause Listening</span>
+      <div class="yulu-header-controls">
+        <button class="yulu-btn-icon" id="yulu-mute-btn" onclick="toggleYuluSpeechFeedback()" title="Mute / Unmute Yulu's Voice">
+          <span id="yulu-mute-icon">🔊</span>
         </button>
-        <span class="vac-hint-text">Web Speech API • Indian & English Accents Supported</span>
+        <button class="yulu-btn-icon" onclick="clearYuluChat()" title="Clear conversation">
+          <span>🧹</span>
+        </button>
+        <button class="yulu-btn-icon yulu-close-btn" onclick="toggleYuluCopilot()" title="Minimize Yulu">
+          <span>✕</span>
+        </button>
       </div>
+    </div>
+
+    <!-- Siri / Gemini Live Dynamic Visualizer Orb Area -->
+    <div class="yulu-visualizer-bar" id="yulu-visualizer-bar">
+      <div class="yulu-orb-container" id="yulu-orb-container">
+        <div class="yulu-orb-core" id="yulu-orb-core">
+          <div class="yulu-orb-soundwaves" id="yulu-soundwaves">
+            <span class="ysw-bar"></span>
+            <span class="ysw-bar"></span>
+            <span class="ysw-bar"></span>
+            <span class="ysw-bar"></span>
+            <span class="ysw-bar"></span>
+            <span class="ysw-bar"></span>
+            <span class="ysw-bar"></span>
+          </div>
+          <span class="yulu-orb-glyph" id="yulu-orb-glyph">✨</span>
+        </div>
+      </div>
+      <div class="yulu-live-headline-wrap">
+        <div class="yulu-live-headline" id="yulu-live-headline">"Hi! I'm Yulu. What would you like to eat?"</div>
+        <div class="yulu-live-subtext" id="yulu-live-subtext">Say <em>"Order 2 Masala Dosa"</em> or <em>"Show Breakfast"</em></div>
+      </div>
+    </div>
+
+    <!-- Live Staged Order Bar (Autonomous 1-Click Order Confirmation) -->
+    <div class="yulu-order-staging-bar" id="yulu-order-staging-bar" style="display: none;">
+      <div class="yosb-left">
+        <span class="yosb-tag">🛒 STAGED ORDER</span>
+        <div class="yosb-items" id="yosb-items-preview">--</div>
+        <div class="yosb-meta">
+          <span class="yosb-price" id="yosb-price">₹0</span>
+          <span class="yosb-slot" id="yosb-slot">⏰ Immediate</span>
+        </div>
+      </div>
+      <button class="yosb-order-btn" id="yosb-confirm-btn" onclick="executeAutonomousOrder()" title="Confirm and place order immediately">
+        <span>🚀 Place Order</span>
+      </button>
+    </div>
+
+    <!-- Conversation Feed Stream -->
+    <div class="yulu-chat-feed" id="yulu-chat-feed">
+      <!-- Seed Welcome Message -->
+      <div class="yulu-msg yulu-msg-ai">
+        <div class="ym-avatar">🤖</div>
+        <div class="ym-bubble">
+          <div class="ym-author">Yulu AI</div>
+          <div class="ym-text">
+            Namaste! I am your <strong>autonomous mess copilot</strong>. 
+            Just tell me what you're craving, and I can <strong>automatically order, choose your pickup slot, and generate your token pass</strong> in 1 step! 🚀
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Action Chips (Tap to Voice Execute) -->
+    <div class="yulu-chips-wrapper">
+      <div class="yulu-chips-scroll" id="yulu-chips-scroll">
+        <button class="yulu-chip yulu-chip-primary" onclick="handleYuluChipCommand('Order 2 Masala Dosa')">
+          ⚡ "Order 2 Masala Dosa"
+        </button>
+        <button class="yulu-chip" onclick="handleYuluChipCommand('Order Vada Pav')">
+          🥪 "Order Vada Pav"
+        </button>
+        <button class="yulu-chip" onclick="handleYuluChipCommand('Show Beverages')">
+          ☕ "Show Beverages"
+        </button>
+        <button class="yulu-chip" onclick="handleYuluChipCommand('Confirm Order')">
+          🚀 "Place Order"
+        </button>
+        <button class="yulu-chip" onclick="handleYuluChipCommand('Show Breakfast')">
+          🥞 "Show Breakfast"
+        </button>
+        <button class="yulu-chip" onclick="handleYuluChipCommand('Track My Order')">
+          📍 "Track Order"
+        </button>
+        <button class="yulu-chip" onclick="handleYuluChipCommand('Clear Cart')">
+          🗑️ "Clear Cart"
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive Footer: Mic + Text Input -->
+    <div class="yulu-footer-dock">
+      <button class="yulu-mic-main-btn" id="yulu-mic-main-btn" onclick="toggleYuluVoiceListening()" title="Click to talk to Yulu">
+        <span class="ymm-pulse-ring"></span>
+        <span class="ymm-icon" id="yulu-mic-icon">🎙️</span>
+        <span class="ymm-text" id="yulu-mic-text">Tap to Speak</span>
+      </button>
+
+      <form class="yulu-text-form" onsubmit="handleYuluTextSubmit(event)">
+        <input type="text" id="yulu-text-input" class="yulu-text-input" placeholder="Or type a command for Yulu..." autocomplete="off">
+        <button type="submit" class="yulu-send-btn" title="Send command">➤</button>
+      </form>
     </div>
   </div>
 
