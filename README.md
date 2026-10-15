@@ -72,7 +72,7 @@
 ### 1. 📱 Student Experience (Mobile & Web App)
 - **Menu & Price (₹)**: Categorized canteen items with real-time stock levels, preparation times, and instant search.
 - **Pre-Order (Cart & Slot Selection)**: Dynamic cart slide-over with item quantity steppers, subtotal & grand total calculation, and slot selection with capacity hints (*e.g., "12:30 PM (3 spots left)"*).
-- **Cash at Pickup Checkout**: Zero-hassle checkout generating a persistent unique token (e.g. `#SC-1005`).
+- **Cash at Pickup Checkout**: Zero-hassle checkout generating a persistent unique token (e.g. `#YR-1005`).
 - **Live Order Tracker (5-Stage Visual Stepper)**:
   $$\text{1. Placed} \longrightarrow \text{2. Accepted} \longrightarrow \text{3. Preparing} \longrightarrow \text{4. Ready for Pickup} \longrightarrow \text{5. Collected}$$
   with live polling sync every 4 seconds.
@@ -149,7 +149,7 @@ npm.cmd start
 1. **Student Pre-Order**:
    - Open `http://localhost:3000`
    - Select items from menu ➔ Open cart ➔ Click *Proceed to Checkout*
-   - Pick time slot `12:45 PM` ➔ Submit order ➔ Receive unique token `#SC-XXXX`
+   - Pick time slot `12:45 PM` ➔ Submit order ➔ Receive unique token `#YR-XXXX`
 2. **Cancellation & Stock Restoration (Demonstrating Business Rules)**:
    - On the Live Tracker, click *Cancel Order ✕*
    - Observe order marked as `Cancelled` and note that stock in menu is restored!

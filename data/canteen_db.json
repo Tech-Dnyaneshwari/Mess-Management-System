@@ -7,7 +7,7 @@
       "price": 50,
       "description": "Crispy golden crepe served with spiced potato masala, coconut chutney, and piping hot sambar.",
       "image": "dosa",
-      "stock": 24,
+      "stock": 20,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "Bestseller"
@@ -19,7 +19,7 @@
       "price": 30,
       "description": "Classic spiced potato fritters encased in soft pav with garlic chutney and fried green chillies.",
       "image": "vadapav",
-      "stock": 39,
+      "stock": 36,
       "isAvailable": true,
       "prepTime": "5 mins",
       "badge": "Popular"
@@ -155,12 +155,193 @@
       "prepTime": "6 mins",
       "badge": "New",
       "image": "food-default"
+    },
+    {
+      "id": "menu-1792078824518",
+      "name": "Sold Out Pastry",
+      "category": "Desserts",
+      "price": 60,
+      "description": "",
+      "stock": 0,
+      "isAvailable": false,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792078824580",
+      "name": "Limited Samosa Portion",
+      "category": "Snacks",
+      "price": 25,
+      "description": "",
+      "stock": 2,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792078824586",
+      "name": "South Indian Filter Coffee",
+      "category": "Beverages",
+      "price": 30,
+      "description": "",
+      "stock": 45,
+      "isAvailable": true,
+      "prepTime": "4 mins",
+      "badge": "",
+      "image": "food-default"
     }
   ],
   "orders": [
     {
+      "id": "ord-1010",
+      "token": "YR-1010",
+      "studentName": "Eligible Canceller",
+      "rollNumber": "CS-009",
+      "phone": "N/A",
+      "pickupSlot": "01:30 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Cancelled",
+      "createdAt": "2026-10-15T15:40:24.566Z",
+      "totalAmount": 60,
+      "items": [
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 2,
+          "subtotal": 60
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-15T15:40:24.566Z"
+        },
+        {
+          "status": "Cancelled",
+          "time": "2026-10-15T15:40:24.571Z",
+          "reason": "Accidental order"
+        }
+      ]
+    },
+    {
+      "id": "ord-1009",
+      "token": "YR-1009",
+      "studentName": "Late Canceller",
+      "rollNumber": "CS-008",
+      "phone": "N/A",
+      "pickupSlot": "01:15 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Preparing",
+      "createdAt": "2026-10-15T15:40:24.556Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-15T15:40:24.556Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-15T15:40:24.559Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1008",
+      "token": "YR-1008",
+      "studentName": "Aarav Sharma",
+      "rollNumber": "CS-2024-099",
+      "phone": "N/A",
+      "pickupSlot": "01:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Paid",
+      "status": "Collected",
+      "createdAt": "2026-10-15T15:40:24.534Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-15T15:40:24.534Z"
+        },
+        {
+          "status": "Accepted",
+          "time": "2026-10-15T15:40:24.541Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-15T15:40:24.543Z"
+        },
+        {
+          "status": "Ready for Pickup",
+          "time": "2026-10-15T15:40:24.546Z"
+        },
+        {
+          "status": "Collected",
+          "time": "2026-10-15T15:40:24.549Z"
+        }
+      ],
+      "paidAt": "2026-10-15T15:40:24.549Z"
+    },
+    {
+      "id": "ord-1007",
+      "token": "YR-1007",
+      "studentName": "T2 Calc Student",
+      "rollNumber": "CS-002",
+      "phone": "N/A",
+      "pickupSlot": "12:45 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Placed",
+      "createdAt": "2026-10-15T15:40:24.526Z",
+      "totalAmount": 190,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 2,
+          "subtotal": 100
+        },
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 3,
+          "subtotal": 90
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-15T15:40:24.526Z"
+        }
+      ]
+    },
+    {
       "id": "ord-1006",
-      "token": "SC-1006",
+      "token": "YR-1006",
       "studentName": "Rahul Roy",
       "rollNumber": "IT-2024-001",
       "phone": "9876543210",
@@ -193,7 +374,7 @@
     },
     {
       "id": "ord-1005",
-      "token": "SC-1005",
+      "token": "YR-1005",
       "studentName": "Test Student",
       "rollNumber": "CS-TEST",
       "phone": "9998887777",
@@ -226,7 +407,7 @@
     },
     {
       "id": "ord-1004",
-      "token": "SC-1004",
+      "token": "YR-1004",
       "studentName": "Yash Rane",
       "rollNumber": "CS-2024-055",
       "phone": "9820011223",
@@ -277,7 +458,7 @@
     },
     {
       "id": "ord-1001",
-      "token": "SC-1001",
+      "token": "YR-1001",
       "studentName": "Rohan Sharma",
       "rollNumber": "CS-2024-042",
       "phone": "9876543210",
@@ -320,7 +501,7 @@
     },
     {
       "id": "ord-1002",
-      "token": "SC-1002",
+      "token": "YR-1002",
       "studentName": "Priya Patel",
       "rollNumber": "IT-2024-019",
       "phone": "9812345678",
@@ -367,7 +548,7 @@
     },
     {
       "id": "ord-1003",
-      "token": "SC-1003",
+      "token": "YR-1003",
       "studentName": "Aditya Verma",
       "rollNumber": "ME-2024-008",
       "phone": "9700112233",
@@ -395,7 +576,7 @@
     },
     {
       "id": "ord-1000",
-      "token": "SC-1000",
+      "token": "YR-1000",
       "studentName": "Sneha Rao",
       "rollNumber": "EC-2024-031",
       "phone": "9988776655",
@@ -448,7 +629,7 @@
   "feedback": [
     {
       "id": "fb-1792071857767",
-      "orderToken": "SC-1004",
+      "orderToken": "YR-1004",
       "studentName": "Yash Rane",
       "rating": 5,
       "comment": "Lightning fast pickup! Dosa was super crispy and cold coffee was amazing.",
@@ -456,7 +637,7 @@
     },
     {
       "id": "fb-1",
-      "orderToken": "SC-1000",
+      "orderToken": "YR-1000",
       "studentName": "Sneha Rao",
       "rating": 5,
       "comment": "The Paneer Thali was piping hot and delicious! Quick pickup within 15 minutes.",
@@ -464,7 +645,7 @@
     },
     {
       "id": "fb-2",
-      "orderToken": "SC-0998",
+      "orderToken": "YR-0998",
       "studentName": "Amit Kulkarni",
       "rating": 5,
       "comment": "Cold Coffee is top notch! Pre-ordering saved me 20 mins of standing in queue during recess.",
@@ -472,12 +653,12 @@
     },
     {
       "id": "fb-3",
-      "orderToken": "SC-0995",
+      "orderToken": "YR-0995",
       "studentName": "Meera Joshi",
       "rating": 4,
       "comment": "Masala Dosa was crisp and sambar tasted authentic. Will order again tomorrow.",
       "createdAt": "2026-10-15T16:20:00.000Z"
     }
   ],
-  "nextOrderNumber": 1007
+  "nextOrderNumber": 1011
 }

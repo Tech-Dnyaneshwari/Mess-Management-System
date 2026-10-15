@@ -317,7 +317,8 @@ app.get('/api/orders/:tokenOrId', (req, res) => {
   
   const order = (db.orders || []).find(o => 
     o.token.toUpperCase() === param || 
-    o.token.toUpperCase() === `SC-${param.replace(/^SC-?/, '')}` ||
+    o.token.toUpperCase() === `YR-${param.replace(/^(YR|SC)-?/, '')}` ||
+    o.token.toUpperCase() === `SC-${param.replace(/^(YR|SC)-?/, '')}` ||
     o.id.toUpperCase() === param
   );
   
@@ -402,7 +403,7 @@ app.post('/api/orders', (req, res) => {
   
   // 3. Generate unique order token
   const tokenNum = db.nextOrderNumber || 1001;
-  const token = `SC-${tokenNum}`;
+  const token = `YR-${tokenNum}`;
   db.nextOrderNumber = tokenNum + 1;
   
   const now = new Date().toISOString();

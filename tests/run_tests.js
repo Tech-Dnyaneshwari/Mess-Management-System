@@ -136,7 +136,7 @@ async function runTests() {
       items: [{ id: itemA.id, quantity: 1 }]
     });
     const orderData = validOrder.body.data;
-    assert(validOrder.status === 201 && /^SC-\d+$/.test(orderData.token), 'Order assigned unique token format (e.g. SC-1007)', orderData.token);
+    assert(validOrder.status === 201 && /^YR-\d+$/.test(orderData.token), 'Order assigned unique token format (e.g. YR-1007)', orderData.token);
 
     // ----------------------------------------------------
     // TEST 5: The order appears in the staff dashboard

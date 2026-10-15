@@ -608,9 +608,9 @@ function updateRecentTokensUI() {
     if (recents.length === 0) {
       container.innerHTML = `
         <span style="font-size: 0.8rem; color: var(--text-dim);">Quick Demo Tokens:</span>
-        <button class="recent-token-pill" onclick="lookupOrderByToken('SC-1001')">#SC-1001</button>
-        <button class="recent-token-pill" onclick="lookupOrderByToken('SC-1002')">#SC-1002</button>
-        <button class="recent-token-pill" onclick="lookupOrderByToken('SC-1003')">#SC-1003</button>
+        <button class="recent-token-pill" onclick="lookupOrderByToken('YR-1001')">#YR-1001</button>
+        <button class="recent-token-pill" onclick="lookupOrderByToken('YR-1002')">#YR-1002</button>
+        <button class="recent-token-pill" onclick="lookupOrderByToken('YR-1003')">#YR-1003</button>
       `;
       return;
     }
