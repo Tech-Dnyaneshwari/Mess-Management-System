@@ -19,7 +19,7 @@
       "price": 30,
       "description": "Classic spiced potato fritters encased in soft pav with garlic chutney and fried green chillies.",
       "image": "vadapav",
-      "stock": 40,
+      "stock": 39,
       "isAvailable": true,
       "prepTime": "5 mins",
       "badge": "Popular"
@@ -143,9 +143,87 @@
       "isAvailable": true,
       "prepTime": "2 mins",
       "badge": "Sweet"
+    },
+    {
+      "id": "menu-1792072593244",
+      "name": "Crispy Onion Pakoda",
+      "category": "Snacks",
+      "price": 40,
+      "description": "Crispy gram-flour coated spiced onion fritters served with tamarind chutney.",
+      "stock": 25,
+      "isAvailable": true,
+      "prepTime": "6 mins",
+      "badge": "New",
+      "image": "food-default"
     }
   ],
   "orders": [
+    {
+      "id": "ord-1006",
+      "token": "SC-1006",
+      "studentName": "Rahul Roy",
+      "rollNumber": "IT-2024-001",
+      "phone": "9876543210",
+      "pickupSlot": "01:30 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Paid",
+      "status": "Preparing",
+      "createdAt": "2026-10-15T13:55:55.209Z",
+      "totalAmount": 30,
+      "items": [
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 1,
+          "subtotal": 30
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-15T13:55:55.209Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-15T13:55:55.248Z"
+        }
+      ],
+      "paidAt": "2026-10-15T13:56:18.217Z"
+    },
+    {
+      "id": "ord-1005",
+      "token": "SC-1005",
+      "studentName": "Test Student",
+      "rollNumber": "CS-TEST",
+      "phone": "9998887777",
+      "pickupSlot": "01:15 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Cancelled",
+      "createdAt": "2026-10-15T13:55:29.037Z",
+      "totalAmount": 100,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 2,
+          "subtotal": 100
+        }
+      ],
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-15T13:55:29.037Z"
+        },
+        {
+          "status": "Cancelled",
+          "time": "2026-10-15T13:55:41.628Z",
+          "reason": "Testing stock restoration"
+        }
+      ]
+    },
     {
       "id": "ord-1004",
       "token": "SC-1004",
@@ -194,7 +272,8 @@
           "status": "Collected",
           "time": "2026-10-15T13:44:08.836Z"
         }
-      ]
+      ],
+      "paymentStatus": "Paid"
     },
     {
       "id": "ord-1001",
@@ -236,7 +315,8 @@
           "status": "Preparing",
           "time": "2026-10-15T18:50:00.000Z"
         }
-      ]
+      ],
+      "paymentStatus": "Pending"
     },
     {
       "id": "ord-1002",
@@ -282,7 +362,8 @@
           "status": "Ready for Pickup",
           "time": "2026-10-15T18:48:00.000Z"
         }
-      ]
+      ],
+      "paymentStatus": "Pending"
     },
     {
       "id": "ord-1003",
@@ -309,7 +390,8 @@
           "status": "Placed",
           "time": "2026-10-15T18:55:00.000Z"
         }
-      ]
+      ],
+      "paymentStatus": "Pending"
     },
     {
       "id": "ord-1000",
@@ -359,7 +441,8 @@
           "status": "Collected",
           "time": "2026-10-15T18:30:00.000Z"
         }
-      ]
+      ],
+      "paymentStatus": "Paid"
     }
   ],
   "feedback": [
@@ -396,5 +479,5 @@
       "createdAt": "2026-10-15T16:20:00.000Z"
     }
   ],
-  "nextOrderNumber": 1005
+  "nextOrderNumber": 1007
 }

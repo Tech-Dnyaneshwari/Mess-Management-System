@@ -1,11 +1,13 @@
 /**
- * SMART CANTEEN MANAGEMENT SYSTEM - FRONTEND APPLICATION LOGIC
- * Architecture: Student Pre-Order + Live Tracker + Kitchen Staff Dashboard + Admin Portal
+ * SMART CANTEEN MANAGEMENT SYSTEM - FRONTEND APPLICATION LOGIC (PHASE 2)
+ * Features: Student Pre-Order + Live Tracker + Kitchen Staff Dashboard + Admin Portal
+ * Business Rules: Stock validation, Slot capacity checks, Payment separation, Order cancellation with stock restoration, Role-based headers
  */
 
 // Global Application State
 const state = {
   currentView: 'student',
+  currentRole: 'student', // 'student' | 'staff' | 'admin'
   currentCategory: 'All',
   searchQuery: '',
   menuItems: [],
@@ -13,8 +15,10 @@ const state = {
   trackingToken: null,
   staffOrders: [],
   staffFilter: 'All',
+  paymentFilter: 'All',
   activeAdminTab: 'reports',
   selectedRating: 5,
+  availableSlots: [],
   pollingTimer: null
 };
 
@@ -44,6 +48,13 @@ function getFoodIcon(imageKey, category) {
   return '🥪';
 }
 
+// Helper to make authenticated/role-aware requests
+function apiFetch(url, options = {}) {
+  const headers = options.headers || {};
+  headers['x-user-role'] = state.currentRole;
+  return fetch(url, { ...options, headers });
+}
+
 // ==========================================================================
 // 1. INITIALIZATION & VIEW NAVIGATION
 // ==========================================================================
@@ -63,10 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
     state.trackingToken = lastToken;
   }
 
-  // Initial load
+  // Initial loads
   loadMenu();
+  loadSlots();
   updateCartUI();
   updateRecentTokensUI();
+  updateRoleIndicator();
   
   // Start background live polling (every 4 seconds)
   startPolling();
@@ -74,6 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function switchView(viewName) {
   state.currentView = viewName;
+
+  // Set active role according to view
+  if (viewName === 'staff') {
+    state.currentRole = 'staff';
+  } else if (viewName === 'admin') {
+    state.currentRole = 'admin';
+  } else {
+    state.currentRole = 'student';
+  }
+  updateRoleIndicator();
 
   // Toggle view visibility
   document.querySelectorAll('.app-view').forEach(el => el.classList.remove('active'));
@@ -88,6 +111,7 @@ function switchView(viewName) {
   // Perform view-specific initializations
   if (viewName === 'student') {
     loadMenu();
+    loadSlots();
   } else if (viewName === 'tracking') {
     if (state.trackingToken) {
       lookupOrderByToken(state.trackingToken, true);
@@ -102,15 +126,29 @@ function switchView(viewName) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Background polling for real-time kitchen and tracking synchronization
+function updateRoleIndicator() {
+  const roleLabel = document.getElementById('current-role-label');
+  if (roleLabel) {
+    roleLabel.innerText = state.currentRole.toUpperCase();
+    if (state.currentRole === 'admin') {
+      roleLabel.style.color = 'var(--accent-purple)';
+    } else if (state.currentRole === 'staff') {
+      roleLabel.style.color = 'var(--accent-amber)';
+    } else {
+      roleLabel.style.color = 'var(--primary)';
+    }
+  }
+}
+
+// Background polling for real-time synchronization
 function startPolling() {
   if (state.pollingTimer) clearInterval(state.pollingTimer);
   state.pollingTimer = setInterval(() => {
-    // Silently refresh staff queue if staff view active
+    // Refresh staff queue if staff view active
     if (state.currentView === 'staff') {
       loadStaffOrders(true);
     }
-    // Silently refresh tracking if tracking view active and token selected
+    // Refresh tracking if tracking view active and token selected
     if (state.currentView === 'tracking' && state.trackingToken) {
       lookupOrderByToken(state.trackingToken, true);
     }
@@ -120,12 +158,47 @@ function startPolling() {
 }
 
 // ==========================================================================
-// 2. STUDENT MENU & CATEGORY FILTERING
+// 2. SLOTS & CAPACITY MANAGEMENT
+// ==========================================
+
+async function loadSlots() {
+  try {
+    const res = await apiFetch('/api/slots');
+    const data = await res.json();
+    if (data.success) {
+      state.availableSlots = data.data;
+      populateSlotDropdown();
+    }
+  } catch (err) {
+    console.warn('Failed to load slots', err);
+  }
+}
+
+function populateSlotDropdown() {
+  const select = document.getElementById('pickup-slot');
+  if (!select) return;
+
+  const currentVal = select.value;
+
+  select.innerHTML = `
+    <option value="">Select a pickup time slot...</option>
+    ${state.availableSlots.map(s => {
+      const isFull = s.remaining <= 0;
+      const label = `${s.slot} (${s.remaining}/${s.capacity} spots available)`;
+      return `<option value="${s.slot}" ${isFull ? 'disabled' : ''} ${s.slot === currentVal ? 'selected' : ''}>
+        ${isFull ? `🔒 ${s.slot} (FULL)` : `🕒 ${label}`}
+      </option>`;
+    }).join('')}
+  `;
+}
+
+// ==========================================================================
+// 3. STUDENT MENU & CATEGORY FILTERING
 // ==========================================================================
 
 async function loadMenu() {
   try {
-    const res = await fetch('/api/menu');
+    const res = await apiFetch('/api/menu');
     const data = await res.json();
     if (data.success) {
       state.menuItems = data.data;
@@ -258,7 +331,7 @@ function renderMenu() {
 }
 
 // ==========================================================================
-// 3. SHOPPING CART & LOCAL PERSISTENCE
+// 4. SHOPPING CART & LOCAL PERSISTENCE
 // ==========================================================================
 
 function addToCart(itemId) {
@@ -380,9 +453,7 @@ function renderCartDrawer(totalAmount) {
 
 function toggleCartDrawer() {
   const drawer = document.getElementById('cart-drawer');
-  const overlay = document.getElementById('drawer-overlay');
   const isActive = drawer.classList.contains('active');
-
   if (isActive) {
     closeCartDrawer();
   } else {
@@ -401,7 +472,7 @@ function closeCartDrawer() {
 }
 
 // ==========================================================================
-// 4. CHECKOUT & TOKEN CREATION
+// 5. CHECKOUT & TOKEN CREATION
 // ==========================================================================
 
 function openCheckoutModal() {
@@ -411,6 +482,7 @@ function openCheckoutModal() {
   }
 
   closeCartDrawer();
+  loadSlots(); // Refresh slot capacity before checkout
 
   // Populate preview
   const totalAmount = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -457,7 +529,7 @@ async function handleCheckoutSubmit(e) {
       items: state.cart.map(c => ({ id: c.id, name: c.name, quantity: c.quantity }))
     };
 
-    const res = await fetch('/api/orders', {
+    const res = await apiFetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -478,7 +550,7 @@ async function handleCheckoutSubmit(e) {
     state.cart = [];
     saveCart();
     updateCartUI();
-    renderMenu();
+    loadMenu(); // Refresh stock in menu
 
     // Save token
     state.trackingToken = createdOrder.token;
@@ -552,7 +624,7 @@ function updateRecentTokensUI() {
 }
 
 // ==========================================================================
-// 5. LIVE ORDER TRACKING (5 STATUSES & VISUAL STEPPER)
+// 6. LIVE ORDER TRACKING (5 STATUSES, CANCELLATION & PAYMENT STATUS)
 // ==========================================================================
 
 function lookupOrderByInput() {
@@ -568,7 +640,7 @@ function lookupOrderByInput() {
 async function lookupOrderByToken(token, silent = false) {
   try {
     const cleanToken = token.trim().toUpperCase();
-    const res = await fetch(`/api/orders/${cleanToken}`);
+    const res = await apiFetch(`/api/orders/${cleanToken}`);
     const data = await res.json();
 
     if (!data.success) {
@@ -628,6 +700,35 @@ function renderTrackingDetails(order) {
   document.getElementById('track-phone').innerText = order.phone || 'N/A';
   document.getElementById('track-slot-info').innerText = order.pickupSlot;
 
+  // Payment Status Pill (Separate from Order Status)
+  const paymentPill = document.getElementById('track-payment-status');
+  if (paymentPill) {
+    if (order.paymentStatus === 'Paid') {
+      paymentPill.innerHTML = `<span style="color: var(--accent-emerald);">Paid ✅ (${order.paidAt ? new Date(order.paidAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Cash'})</span>`;
+    } else {
+      paymentPill.innerHTML = `<span style="color: var(--accent-amber);">Pending (Cash at Counter)</span>`;
+    }
+  }
+
+  // Cancel Order Button Handling (Rule: allowed only before order reaches Preparing)
+  const cancelBtn = document.getElementById('btn-cancel-order');
+  const cancelledBanner = document.getElementById('cancelled-order-banner');
+
+  if (order.status === 'Cancelled') {
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    if (cancelledBanner) cancelledBanner.style.display = 'block';
+  } else if (['Placed', 'Accepted'].includes(order.status)) {
+    if (cancelBtn) {
+      cancelBtn.style.display = 'block';
+      cancelBtn.innerText = `Cancel Order ✕ (Allowed before preparation)`;
+    }
+    if (cancelledBanner) cancelledBanner.style.display = 'none';
+  } else {
+    // Preparing, Ready, or Collected -> Cannot cancel
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    if (cancelledBanner) cancelledBanner.style.display = 'none';
+  }
+
   // Feedback prompt: show if order is Collected
   const fbPrompt = document.getElementById('tracking-feedback-prompt');
   if (fbPrompt) {
@@ -658,10 +759,16 @@ function updateStepperUI(order) {
 
     if (stepElem) {
       stepElem.classList.remove('completed', 'current');
-      if (idx < currentIdx) {
-        stepElem.classList.add('completed');
-      } else if (idx === currentIdx) {
-        stepElem.classList.add('current');
+      if (order.status === 'Cancelled') {
+        // Dim out
+        stepElem.style.opacity = '0.4';
+      } else {
+        stepElem.style.opacity = '1';
+        if (idx < currentIdx) {
+          stepElem.classList.add('completed');
+        } else if (idx === currentIdx) {
+          stepElem.classList.add('current');
+        }
       }
     }
 
@@ -669,19 +776,47 @@ function updateStepperUI(order) {
     if (idx < stages.length - 1) {
       const conn = document.getElementById(`connector-${idx + 1}`);
       if (conn) {
-        conn.classList.toggle('filled', idx < currentIdx);
+        conn.classList.toggle('filled', order.status !== 'Cancelled' && idx < currentIdx);
       }
     }
   });
 }
 
+// Student Order Cancellation
+async function cancelCurrentOrder() {
+  if (!state.trackingToken) return;
+
+  if (!confirm(`Are you sure you want to cancel order #${state.trackingToken}?\n\nReserved items will be restored to canteen stock.`)) {
+    return;
+  }
+
+  try {
+    const res = await apiFetch(`/api/orders/${state.trackingToken}/cancel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason: 'Cancelled by student' })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      loadMenu(); // Refresh stock in menu
+      lookupOrderByToken(state.trackingToken);
+    } else {
+      showToast(data.message || 'Cancellation failed', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to connect to server', 'error');
+  }
+}
+
 // ==========================================================================
-// 6. CANTEEN STAFF KITCHEN DASHBOARD
+// 7. CANTEEN STAFF KITCHEN DASHBOARD
 // ==========================================================================
 
 async function loadStaffOrders(silent = false) {
   try {
-    const res = await fetch('/api/orders');
+    const res = await apiFetch('/api/orders');
     const data = await res.json();
     if (data.success) {
       state.staffOrders = data.data;
@@ -732,7 +867,7 @@ function renderStaffDashboard() {
       <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-md);">
         <div style="font-size: 3rem; margin-bottom: 0.5rem;">✨</div>
         <h3>No ${state.staffFilter === 'All' ? 'active' : state.staffFilter} orders in queue</h3>
-        <p>Kitchen is all caught up!</p>
+        <p>Kitchen queue is clear!</p>
       </div>
     `;
     return;
@@ -741,6 +876,7 @@ function renderStaffDashboard() {
   container.innerHTML = displayed.map(order => {
     const elapsedMinutes = Math.floor((new Date() - new Date(order.createdAt)) / 60000);
     const timeText = elapsedMinutes < 1 ? 'Just now' : `${elapsedMinutes}m ago`;
+    const isPaid = order.paymentStatus === 'Paid';
 
     // Action button depending on current state
     let actionButtons = '';
@@ -749,11 +885,17 @@ function renderStaffDashboard() {
         <button class="btn-kitchen-action btn-primary" onclick="advanceOrderStatus('${order.id}', 'Accepted')">
           Accept Order 👍
         </button>
+        <button class="btn-kitchen-action btn-danger btn-sm" onclick="cancelOrderByStaff('${order.id}')">
+          Cancel & Release Stock ✕
+        </button>
       `;
     } else if (order.status === 'Accepted') {
       actionButtons = `
         <button class="btn-kitchen-action btn-secondary" onclick="advanceOrderStatus('${order.id}', 'Preparing')">
           Start Preparing 🍳
+        </button>
+        <button class="btn-kitchen-action btn-danger btn-sm" onclick="cancelOrderByStaff('${order.id}')">
+          Cancel & Release Stock ✕
         </button>
       `;
     } else if (order.status === 'Preparing') {
@@ -768,6 +910,10 @@ function renderStaffDashboard() {
           Hand Over & Collected 🎉
         </button>
       `;
+    } else if (order.status === 'Cancelled') {
+      actionButtons = `
+        <span style="font-size: 0.8rem; color: var(--accent-rose); text-align: center;">Order Cancelled (Stock Restored)</span>
+      `;
     } else {
       actionButtons = `
         <span style="font-size: 0.8rem; color: var(--text-dim); text-align: center;">Order Completed</span>
@@ -781,21 +927,43 @@ function renderStaffDashboard() {
             <span class="k-token-num">#${order.token}</span>
             <span class="k-time-elapsed">${timeText}</span>
           </div>
-          <span class="k-status-badge current-status-badge status-${order.status.replace(/\s+/g, '')}">${order.status}</span>
+          <div style="text-align: right;">
+            <span class="k-status-badge current-status-badge status-${order.status.replace(/\s+/g, '')}">${order.status}</span>
+            <div style="margin-top: 4px;">
+              <span class="payment-tag ${isPaid ? 'paid' : 'pending'}">
+                ${isPaid ? 'Paid ✅' : 'Cash Pending 💵'}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div class="k-student-info">
           <span class="k-student-name">${order.studentName}</span>
           <span class="k-student-roll">Roll: ${order.rollNumber || 'N/A'} • ${order.phone || ''}</span>
-          <div><span class="k-slot-badge">🕒 Pickup: ${order.pickupSlot}</span></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem;">
+            <span class="k-slot-badge">🕒 Pickup: ${order.pickupSlot}</span>
+            <strong style="color: #fff; font-family: var(--font-mono);">Total: ₹${order.totalAmount}</strong>
+          </div>
         </div>
 
         <div class="k-items-list">
           ${order.items.map(it => `
             <div class="k-item-row">
               <span><span class="k-item-qty">${it.quantity}x</span> ${it.name}</span>
+              <span style="color: var(--text-muted); font-size: 0.8rem;">₹${it.subtotal || (it.price * it.quantity)}</span>
             </div>
           `).join('')}
+        </div>
+
+        <!-- Payment Toggle Button for Staff -->
+        <div style="margin-bottom: 0.75rem;">
+          ${!isPaid && order.status !== 'Cancelled' ? `
+            <button class="btn btn-outline btn-sm btn-block" style="border-color: var(--accent-emerald); color: var(--accent-emerald);" onclick="updatePaymentStatus('${order.id}', 'Paid')">
+              Mark Cash Received (Paid) 💵
+            </button>
+          ` : isPaid ? `
+            <span style="font-size: 0.75rem; color: var(--accent-emerald); display: block; text-align: center;">Payment Verified</span>
+          ` : ''}
         </div>
 
         <div class="k-actions">
@@ -808,7 +976,7 @@ function renderStaffDashboard() {
 
 async function advanceOrderStatus(orderId, newStatus) {
   try {
-    const res = await fetch(`/api/orders/${orderId}/status`, {
+    const res = await apiFetch(`/api/orders/${orderId}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus })
@@ -825,10 +993,51 @@ async function advanceOrderStatus(orderId, newStatus) {
   }
 }
 
+async function updatePaymentStatus(orderId, paymentStatus) {
+  try {
+    const res = await apiFetch(`/api/orders/${orderId}/payment`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentStatus })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Payment marked as ${paymentStatus}`, 'success');
+      loadStaffOrders();
+    } else {
+      showToast(data.message || 'Failed to update payment', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to connect to server', 'error');
+  }
+}
+
+async function cancelOrderByStaff(orderId) {
+  if (!confirm(`Cancel this order?\n\nThis will restore the reserved quantities back to stock.`)) return;
+
+  try {
+    const res = await apiFetch(`/api/orders/${orderId}/cancel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason: 'Cancelled by kitchen staff' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      loadMenu(); // Refresh stock
+      loadStaffOrders();
+    } else {
+      showToast(data.message || 'Cancellation failed', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to cancel order', 'error');
+  }
+}
+
 function updateHeaderPendingBadge() {
   const pendingBadge = document.getElementById('staff-pending-count');
   if (!pendingBadge) return;
-  fetch('/api/orders')
+  apiFetch('/api/orders')
     .then(r => r.json())
     .then(data => {
       if (data.success) {
@@ -840,7 +1049,7 @@ function updateHeaderPendingBadge() {
 }
 
 // ==========================================================================
-// 7. ADMIN DASHBOARD (CRUD & REPORTS / ANALYTICS)
+// 8. ADMIN DASHBOARD (CRUD & REPORTS / ANALYTICS)
 // ==========================================================================
 
 function switchAdminTab(tabName) {
@@ -857,21 +1066,21 @@ function switchAdminTab(tabName) {
 async function loadAdminData() {
   try {
     // 1. Stats & KPIs
-    const statsRes = await fetch('/api/stats');
+    const statsRes = await apiFetch('/api/stats');
     const statsData = await statsRes.json();
     if (statsData.success) {
       renderAdminKPIs(statsData.data);
     }
 
     // 2. Menu Table
-    const menuRes = await fetch('/api/menu');
+    const menuRes = await apiFetch('/api/menu');
     const menuData = await menuRes.json();
     if (menuData.success) {
       renderAdminMenuTable(menuData.data);
     }
 
     // 3. Feedback
-    const fbRes = await fetch('/api/feedback');
+    const fbRes = await apiFetch('/api/feedback');
     const fbData = await fbRes.json();
     if (fbData.success) {
       renderAdminFeedback(fbData.data);
@@ -901,7 +1110,7 @@ function renderAdminKPIs(stats) {
         <div class="bar-row">
           <div class="bar-labels">
             <span><strong>${item.name}</strong></span>
-            <span>${item.count} ordered</span>
+            <span>${item.count} portions sold</span>
           </div>
           <div class="bar-track">
             <div class="bar-fill" style="width: ${pct}%;"></div>
@@ -975,7 +1184,7 @@ function filterAdminMenuTable() {
 
 async function toggleAvailability(id, isAvailable) {
   try {
-    await fetch(`/api/menu/${id}/toggle`, {
+    await apiFetch(`/api/menu/${id}/toggle`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ isAvailable })
@@ -989,7 +1198,7 @@ async function toggleAvailability(id, isAvailable) {
 
 async function updateStockQuick(id, newStock) {
   try {
-    await fetch(`/api/menu/${id}`, {
+    await apiFetch(`/api/menu/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ stock: Number(newStock) })
@@ -1005,7 +1214,7 @@ async function updateStockQuick(id, newStock) {
 async function deleteMenuItem(id, name) {
   if (!confirm(`Are you sure you want to remove "${name}" from the canteen menu?`)) return;
   try {
-    const res = await fetch(`/api/menu/${id}`, { method: 'DELETE' });
+    const res = await apiFetch(`/api/menu/${id}`, { method: 'DELETE' });
     const data = await res.json();
     if (data.success) {
       showToast(`Removed "${name}" from menu`, 'info');
@@ -1063,13 +1272,13 @@ async function handleMenuFormSubmit(e) {
   try {
     let res;
     if (id) {
-      res = await fetch(`/api/menu/${id}`, {
+      res = await apiFetch(`/api/menu/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
     } else {
-      res = await fetch('/api/menu', {
+      res = await apiFetch('/api/menu', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -1118,7 +1327,7 @@ function renderAdminFeedback(feedback) {
 }
 
 // ==========================================================================
-// 8. STUDENT FEEDBACK & RATING (ON COLLECTED ORDERS)
+// 9. STUDENT FEEDBACK & RATING (ON COLLECTED ORDERS)
 // ==========================================================================
 
 function openFeedbackModalForCurrentOrder() {
@@ -1158,7 +1367,7 @@ async function handleFeedbackSubmit(e) {
   const comment = document.getElementById('feedback-comment').value.trim();
 
   try {
-    const res = await fetch('/api/feedback', {
+    const res = await apiFetch('/api/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1183,7 +1392,7 @@ async function handleFeedbackSubmit(e) {
 }
 
 // ==========================================================================
-// 9. TOAST NOTIFICATIONS HELPER
+// 10. TOAST NOTIFICATIONS HELPER
 // ==========================================================================
 
 function showToast(message, type = 'info') {

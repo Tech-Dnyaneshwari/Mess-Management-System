@@ -52,8 +52,11 @@
         </button>
       </nav>
 
-      <!-- Cart Button -->
+      <!-- Cart Button & Role Badge -->
       <div class="header-actions">
+        <div class="role-indicator-badge" id="role-badge-display">
+          Role: <strong id="current-role-label">Student</strong>
+        </div>
         <button class="cart-trigger-btn" id="cart-toggle-btn" onclick="toggleCartDrawer()">
           <span class="cart-icon-wrapper">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
@@ -232,8 +235,16 @@
                 <span>Total Amount Due:</span>
                 <strong class="total-price-text" id="track-total-amount">₹0</strong>
               </div>
-              <div class="payment-note-pill">
-                💵 Payment: <strong>Cash at Pickup Counter</strong>
+              <div class="payment-note-pill" id="track-payment-pill">
+                💵 Payment: <strong id="track-payment-status">Pending (Cash at Counter)</strong>
+              </div>
+              <div id="cancel-order-container" style="margin-top: 0.85rem;">
+                <button class="btn btn-danger btn-sm btn-block" id="btn-cancel-order" onclick="cancelCurrentOrder()" style="display: none;">
+                  Cancel Order ✕ (Restore Stock)
+                </button>
+                <div id="cancelled-order-banner" class="cancelled-banner" style="display: none;">
+                  ⚠️ This order has been cancelled and its reserved items have been restored to the canteen stock.
+                </div>
               </div>
             </div>
 
