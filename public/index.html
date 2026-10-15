@@ -11,6 +11,10 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- CUSTOM DYNAMIC GLOW CURSOR -->
+  <div class="custom-cursor-dot" id="cursor-dot"></div>
+  <div class="custom-cursor-ring" id="cursor-ring"></div>
+
   <!-- AMBIENT GRAPHIC GLOWS -->
   <div class="ambient-glow glow-top-left"></div>
   <div class="ambient-glow glow-top-right"></div>
@@ -205,7 +209,10 @@
     <section class="app-view" id="view-tracking">
       <div class="tracking-container">
         <div class="tracking-lookup-box">
-          <div class="lookup-badge">📍 Real-Time Tracking</div>
+          <div class="lookup-badge">
+            <span>📍 Real-Time Tracking</span>
+            <span class="sync-pulse-badge">● Live Sync Active</span>
+          </div>
           <h2 class="tracking-title">Live Meal Status Tracker</h2>
           <p class="tracking-desc">Track your token status in real-time as the mess kitchen prepares your order.</p>
           
@@ -244,6 +251,40 @@
               <div class="pickup-slot-highlight">
                 <span class="slot-label">Pickup Slot:</span>
                 <strong id="track-slot-display">12:45 PM</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Token Action Bar -->
+          <div class="tracker-action-strip">
+            <button class="tracker-strip-btn" onclick="copyCurrentToken()" title="Copy token code">
+              📋 Copy Token <span class="kbd-hint">#<span id="strip-token-text">YR-1001</span></span>
+            </button>
+            <button class="tracker-strip-btn" onclick="openQrExpandedModal()" title="View large QR for counter scanner">
+              🔍 Enlarge Counter QR
+            </button>
+            <button class="tracker-strip-btn" onclick="printOrderTokenReceipt()" title="Print / Download slip">
+              🖨️ Print Voucher Slip
+            </button>
+          </div>
+
+          <!-- Live Preparation Status & Estimated Countdown Banner -->
+          <div class="tracker-live-status-bar" id="tracker-countdown-bar">
+            <div class="tlsb-left">
+              <div class="tlsb-icon-wrap" id="tlsb-icon">🍳</div>
+              <div class="tlsb-text-wrap">
+                <div class="tlsb-title" id="tlsb-title">Chef is Cooking Your Meal</div>
+                <div class="tlsb-sub" id="tlsb-sub">Estimated collection time based on active kitchen queue</div>
+              </div>
+            </div>
+            <div class="tlsb-right">
+              <div class="tlsb-timer-box">
+                <span class="tlsb-timer-label">ESTIMATED READY IN</span>
+                <span class="tlsb-timer-val" id="tracker-timer-val">~06:30 mins</span>
+              </div>
+              <div class="tlsb-queue-pill" id="tracker-queue-pos">
+                <span class="pulse-dot-cyan"></span>
+                <span id="tracker-queue-text">Queue Position: <strong>#1 in Kitchen</strong></span>
               </div>
             </div>
           </div>

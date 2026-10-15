@@ -17,7 +17,8 @@ const state = {
   staffFilter: 'All',
   selectedRating: 5,
   availableSlots: [],
-  pollingTimer: null
+  pollingTimer: null,
+  lastAnnouncedStatus: null
 };
 
 // Food icon mapping helper
@@ -196,6 +197,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Smart Meal of the Moment live clock and greeting
   initMealMomentClock();
+
+  // Initialize Custom Dynamic Glow Cursor
+  initCustomCursor();
 
   // Check URL query parameters for direct QR scan tracking (?track=YR-XXXX)
   const urlParams = new URLSearchParams(window.location.search);
@@ -798,6 +802,112 @@ function closeReceiptModal() {
   if (receiptModal) receiptModal.classList.remove('active');
 }
 
+// Copy Token to Clipboard Helper
+function copyCurrentToken() {
+  const token = state.currentTrackedOrder ? state.currentTrackedOrder.token : (state.trackingToken || 'YR-1001');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(token).then(() => {
+      showToast(`Token #${token} copied to clipboard!`, 'success');
+    }).catch(() => {
+      showToast(`Token: #${token}`, 'info');
+    });
+  } else {
+    showToast(`Token: #${token}`, 'info');
+  }
+}
+
+// Web Audio API Cafeteria Notification Sound Synthesizer
+function playCafeteriaChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+
+    // Ding (587.33 Hz - D5)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(587.33, ctx.currentTime);
+    gain1.gain.setValueAtTime(0.22, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.65);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start();
+    osc1.stop(ctx.currentTime + 0.65);
+
+    // Dong (880.00 Hz - A5)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880.00, ctx.currentTime + 0.2);
+    gain2.gain.setValueAtTime(0.28, ctx.currentTime + 0.2);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.25);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.2);
+    osc2.stop(ctx.currentTime + 1.25);
+  } catch (e) {
+    console.warn('Audio chime warning:', e);
+  }
+}
+
+// Custom Cursor Movement with Smooth Lerp
+function initCustomCursor() {
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
+
+  if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
+    dot.style.display = 'none';
+    ring.style.display = 'none';
+    return;
+  }
+
+  let mouseX = -100, mouseY = -100;
+  let ringX = -100, ringY = -100;
+  let isMoving = false;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.left = `${mouseX}px`;
+    dot.style.top = `${mouseY}px`;
+    if (!isMoving) {
+      isMoving = true;
+      ringX = mouseX;
+      ringY = mouseY;
+    }
+  });
+
+  function renderCursor() {
+    ringX += (mouseX - ringX) * 0.18;
+    ringY += (mouseY - ringY) * 0.18;
+    ring.style.left = `${ringX}px`;
+    ring.style.top = `${ringY}px`;
+    requestAnimationFrame(renderCursor);
+  }
+  requestAnimationFrame(renderCursor);
+
+  // Hover expansion on interactive elements
+  const hoverSelectors = 'button, a, input, select, textarea, .food-card, .chip, .nav-tab, .recent-token-pill, .cart-trigger-btn, .meal-pill-btn, .token-banner-qr, .qr-image-wrapper, .tracker-strip-btn';
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest(hoverSelectors)) {
+      ring.classList.add('cursor-hover');
+    }
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest(hoverSelectors)) {
+      ring.classList.remove('cursor-hover');
+    }
+  });
+
+  document.addEventListener('mousedown', () => ring.classList.add('cursor-active'));
+  document.addEventListener('mouseup', () => ring.classList.remove('cursor-active'));
+}
+
 function saveRecentToken(token) {
   try {
     let recents = JSON.parse(localStorage.getItem('smart_canteen_recent_tokens') || '[]');
@@ -901,6 +1011,68 @@ function renderTrackingDetails(order) {
   statusPill.className = `current-status-badge status-${order.status.replace(/\s+/g, '')}`;
 
   document.getElementById('track-slot-display').innerText = order.pickupSlot;
+
+  // Update quick action strip token text
+  const stripTokenEl = document.getElementById('strip-token-text');
+  if (stripTokenEl) stripTokenEl.innerText = order.token;
+
+  // Live Preparation Countdown & Queue Bar Update
+  const countdownBar = document.getElementById('tracker-countdown-bar');
+  const tlsbIcon = document.getElementById('tlsb-icon');
+  const tlsbTitle = document.getElementById('tlsb-title');
+  const tlsbSub = document.getElementById('tlsb-sub');
+  const timerVal = document.getElementById('tracker-timer-val');
+  const queueText = document.getElementById('tracker-queue-text');
+
+  if (countdownBar) {
+    countdownBar.classList.remove('status-ready-state');
+
+    if (order.status === 'Ready for Pickup') {
+      countdownBar.classList.add('status-ready-state');
+      if (tlsbIcon) tlsbIcon.innerText = '🔔';
+      if (tlsbTitle) tlsbTitle.innerText = '🎉 Your Meal is Ready at Counter 2!';
+      if (tlsbSub) tlsbSub.innerText = 'Present token #' + order.token + ' or your QR code to the counter server.';
+      if (timerVal) timerVal.innerText = 'READY NOW';
+      if (queueText) queueText.innerHTML = 'Status: <strong style="color: #6ee7b7;">Ready for Handover</strong>';
+
+      // Play audio chime if status just changed to Ready
+      if (state.lastAnnouncedStatus !== order.token + '_Ready') {
+        state.lastAnnouncedStatus = order.token + '_Ready';
+        playCafeteriaChime();
+        showToast(`🔔 Meal Ready! Token #${order.token} is waiting at Counter 2`, 'success');
+      }
+    } else if (order.status === 'Preparing') {
+      if (tlsbIcon) tlsbIcon.innerText = '🍳';
+      if (tlsbTitle) tlsbTitle.innerText = 'Chef is Cooking Your Meal';
+      if (tlsbSub) tlsbSub.innerText = 'Ingredients on the stove; cooking fresh for your pickup slot.';
+      if (timerVal) timerVal.innerText = '~04:30 mins';
+      if (queueText) queueText.innerHTML = 'Status: <strong style="color: var(--accent-amber);">Cooking Active</strong>';
+    } else if (order.status === 'Accepted') {
+      if (tlsbIcon) tlsbIcon.innerText = '👍';
+      if (tlsbTitle) tlsbTitle.innerText = 'Order Accepted & Verified';
+      if (tlsbSub) tlsbSub.innerText = 'Queued up for cooking at counter kitchen.';
+      if (timerVal) timerVal.innerText = '~08:00 mins';
+      if (queueText) queueText.innerHTML = 'Queue: <strong>Up Next</strong>';
+    } else if (order.status === 'Placed') {
+      if (tlsbIcon) tlsbIcon.innerText = '📋';
+      if (tlsbTitle) tlsbTitle.innerText = 'Order Sent to Mess Kitchen';
+      if (tlsbSub) tlsbSub.innerText = 'Waiting for kitchen staff verification.';
+      if (timerVal) timerVal.innerText = '~10:00 mins';
+      if (queueText) queueText.innerHTML = 'Queue: <strong>Order Logged</strong>';
+    } else if (order.status === 'Collected') {
+      if (tlsbIcon) tlsbIcon.innerText = '✅';
+      if (tlsbTitle) tlsbTitle.innerText = 'Order Collected & Completed';
+      if (tlsbSub) tlsbSub.innerText = 'Enjoy your delicious meal! Share your rating below.';
+      if (timerVal) timerVal.innerText = 'Collected';
+      if (queueText) queueText.innerHTML = 'Status: <strong>Completed</strong>';
+    } else if (order.status === 'Cancelled') {
+      if (tlsbIcon) tlsbIcon.innerText = '⚠️';
+      if (tlsbTitle) tlsbTitle.innerText = 'Order Cancelled';
+      if (tlsbSub) tlsbSub.innerText = 'Reserved items restored back to stock inventory.';
+      if (timerVal) timerVal.innerText = 'Cancelled';
+      if (queueText) queueText.innerHTML = 'Status: <strong style="color: var(--accent-rose);">Cancelled</strong>';
+    }
+  }
 
   // Render 5-step stepper
   updateStepperUI(order);
