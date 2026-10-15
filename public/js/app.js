@@ -46,6 +46,118 @@ function getFoodIcon(imageKey, category) {
   return '🥪';
 }
 
+// Rich Nutritional & Spice Metadata for Canteen Specials
+const dishMetadata = {
+  'menu-1': { isVeg: true, spice: '🌶️ Mild', calories: 320, rating: '4.9 (142)' },
+  'menu-2': { isVeg: true, spice: '🌶️ Medium', calories: 280, rating: '4.8 (210)' },
+  'menu-3': { isVeg: true, spice: '🌶️ Medium', calories: 310, rating: '4.8 (185)' },
+  'menu-4': { isVeg: true, spice: '🌶️ Mild', calories: 340, rating: '4.7 (96)' },
+  'menu-5': { isVeg: true, spice: '🌶️ Medium', calories: 640, rating: '4.9 (175)' },
+  'menu-6': { isVeg: true, spice: '🌶️ Spicy', calories: 560, rating: '4.9 (190)' },
+  'menu-7': { isVeg: true, spice: '🌶️ Medium', calories: 490, rating: '4.8 (130)' },
+  'menu-8': { isVeg: true, spice: '🌶️ Mild', calories: 260, rating: '4.7 (115)' },
+  'menu-9': { isVeg: true, spice: 'Sweet', calories: 190, rating: '4.9 (240)' },
+  'menu-10': { isVeg: true, spice: 'Spiced', calories: 95, rating: '4.9 (310)' },
+  'menu-11': { isVeg: true, spice: 'Tangy', calories: 110, rating: '4.6 (75)' },
+  'menu-12': { isVeg: true, spice: 'Sweet', calories: 230, rating: '4.8 (88)' },
+  'default': { isVeg: true, spice: 'Fresh', calories: 280, rating: '4.8 (50)' }
+};
+
+// ==========================================================================
+// SMART MEAL-OF-THE-MOMENT LOGIC (TIME-AWARE GREETING & FILTERS)
+// ==========================================================================
+
+function getMealMomentInfo(date = new Date()) {
+  const hours = date.getHours();
+  if (hours >= 6 && hours < 11) {
+    return {
+      category: 'Breakfast',
+      title: '☀️ Good Morning! Fresh Breakfast Specials',
+      desc: 'Crispy Masala Dosa, South Indian Idli & Piping Hot Filter Coffee ready at Counter 1.',
+      icon: '🥞'
+    };
+  } else if (hours >= 11 && hours < 16) {
+    return {
+      category: 'Meals',
+      title: '🍛 Lunch Hour Rush! Fresh Meals & Thali',
+      desc: 'Special Paneer Butter Masala Thali, Veg Dum Biryani & Chole Bhature are freshly cooked.',
+      icon: '🍛'
+    };
+  } else if (hours >= 16 && hours < 19) {
+    return {
+      category: 'Snacks',
+      title: '☕ Evening Tea & Hot Canteen Snacks',
+      desc: 'Mumbai Vada Pav, Crispy Samosas, Grilled Sandwiches & Special Masala Chai ready to serve.',
+      icon: '🥪'
+    };
+  } else {
+    return {
+      category: 'All',
+      title: '🌙 Dinner & Night Canteen Specials',
+      desc: 'Pre-order your dinner meals, thali, hot noodles & cold coffee before counter closing.',
+      icon: '🌙'
+    };
+  }
+}
+
+function updateMealMomentUI() {
+  const now = new Date();
+  const clockEl = document.getElementById('live-digital-clock');
+  if (clockEl) {
+    clockEl.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  const moment = getMealMomentInfo(now);
+  const titleEl = document.getElementById('meal-greeting-text');
+  const descEl = document.getElementById('meal-greeting-desc');
+
+  if (titleEl && (!titleEl.dataset.customized || titleEl.dataset.customized === 'false')) {
+    titleEl.innerText = moment.title;
+    if (descEl) descEl.innerText = moment.desc;
+  }
+}
+
+function initMealMomentClock() {
+  updateMealMomentUI();
+  setInterval(updateMealMomentUI, 1000);
+
+  // Auto-highlight initial meal period based on current hour
+  const moment = getMealMomentInfo();
+  const targetMeal = moment.category === 'All' ? 'Meals' : moment.category;
+  document.querySelectorAll('#meal-slots-pills-bar .meal-pill-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-meal') === targetMeal);
+  });
+}
+
+function applyMealMomentFilter(category) {
+  const titleEl = document.getElementById('meal-greeting-text');
+  const descEl = document.getElementById('meal-greeting-desc');
+  
+  if (titleEl) {
+    titleEl.dataset.customized = 'true';
+    if (category === 'Breakfast') {
+      titleEl.innerText = '🥞 Breakfast Specials Menu';
+      if (descEl) descEl.innerText = 'Serving crispy dosas, fresh idli sambar, and hot morning beverages.';
+    } else if (category === 'Meals') {
+      titleEl.innerText = '🍛 Lunch & Thali Specials Menu';
+      if (descEl) descEl.innerText = 'Hearty lunch thalis, dum biryani, and freshly prepared hot meals.';
+    } else if (category === 'Snacks') {
+      titleEl.innerText = '🥪 Evening Snacks & Tea Menu';
+      if (descEl) descEl.innerText = 'Crispy samosa pav, vada pav, sandwiches, and hot masala chai.';
+    } else {
+      titleEl.innerText = '🍽️ Full Campus Mess Menu';
+      if (descEl) descEl.innerText = 'Browse all categories, snacks, breakfast, beverages, and desserts.';
+    }
+  }
+
+  // Update meal pill buttons active state
+  document.querySelectorAll('#meal-slots-pills-bar .meal-pill-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-meal') === category);
+  });
+
+  filterByCategory(category);
+}
+
 // Helper to make authenticated/role-aware requests
 function apiFetch(url, options = {}) {
   const headers = options.headers || {};
@@ -81,6 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Start background live polling (every 4 seconds)
   startPolling();
+
+  // Initialize Smart Meal of the Moment live clock and greeting
+  initMealMomentClock();
 
   // Check URL query parameters for direct QR scan tracking (?track=YR-XXXX)
   const urlParams = new URLSearchParams(window.location.search);
@@ -291,6 +406,7 @@ function renderMenu() {
     const cartItem = state.cart.find(c => c.id === item.id);
     const inCartQty = cartItem ? cartItem.quantity : 0;
     const icon = getFoodIcon(item.image, item.category);
+    const meta = dishMetadata[item.id] || dishMetadata['default'];
 
     let stockTag = `<span class="stock-tag in-stock">● In Stock (${item.stock})</span>`;
     if (isOut) {
@@ -300,7 +416,7 @@ function renderMenu() {
     }
 
     return `
-      <div class="food-card ${isOut ? 'out-of-stock' : ''}">
+      <div class="food-card ${isOut ? 'out-of-stock' : ''}" data-category="${item.category}">
         <div class="card-visual">
           <span class="food-icon-huge">${icon}</span>
           ${item.badge ? `<span class="card-badge">${item.badge}</span>` : ''}
@@ -308,8 +424,19 @@ function renderMenu() {
         </div>
 
         <div class="card-details">
-          <span class="card-category">${item.category}</span>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.2rem;">
+            <span class="card-category">${item.category}</span>
+            <span class="veg-badge" title="100% Pure Veg Canteen Meal"><span class="veg-dot"></span></span>
+          </div>
+
           <h3 class="card-name">${item.name}</h3>
+          
+          <div class="card-meta-chips">
+            <span class="meta-chip spice-chip">${meta.spice}</span>
+            <span class="meta-chip kcal-chip">🔥 ${meta.calories} kcal</span>
+            <span class="meta-chip rating-chip">★ ${meta.rating}</span>
+          </div>
+
           <p class="card-desc">${item.description || 'Delicious freshly prepared mess specialty.'}</p>
 
           <div class="card-footer-row">
@@ -330,7 +457,7 @@ function renderMenu() {
                 </div>
               ` : `
                 <button class="add-btn" onclick="addToCart('${item.id}')">
-                  + Add
+                  + Add to Cart
                 </button>
               `}
             </div>

@@ -476,6 +476,235 @@ body {
   color: #fff;
 }
 
+/* ==============================================================
+   SMART MEAL-OF-THE-MOMENT DYNAMIC WIDGET
+   ============================================================== */
+.meal-moment-card {
+  background: linear-gradient(135deg, rgba(14, 21, 52, 0.95) 0%, rgba(18, 30, 72, 0.9) 100%);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.75rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38), 0 0 20px rgba(99, 102, 241, 0.15);
+  backdrop-filter: blur(14px);
+  position: relative;
+  overflow: hidden;
+}
+
+.meal-moment-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #f59e0b, #10b981, #3b82f6);
+}
+
+.meal-moment-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.meal-live-pulse-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+.live-dot-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-emerald);
+  box-shadow: 0 0 10px var(--accent-emerald);
+  animation: pulseDot 1.8s infinite;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.live-badge-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--accent-emerald);
+  letter-spacing: 0.06em;
+}
+
+.live-digital-clock {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.meal-greeting-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.meal-greeting-desc {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  max-width: 620px;
+  line-height: 1.45;
+}
+
+/* Meal Pills Selector */
+.meal-slots-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.meal-pill-btn {
+  background: rgba(10, 16, 38, 0.75);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-muted);
+  min-width: 95px;
+}
+
+.meal-pill-btn:hover {
+  background: rgba(30, 45, 95, 0.8);
+  border-color: var(--primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.meal-pill-btn.active {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(59, 130, 246, 0.45));
+  border: 1.5px solid var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 16px var(--primary-glow);
+  transform: translateY(-2px);
+}
+
+.mp-icon { font-size: 1.3rem; margin-bottom: 0.2rem; }
+.mp-name { font-size: 0.8rem; font-weight: 700; }
+.mp-time { font-size: 0.68rem; color: var(--accent-cyan); font-family: var(--font-mono); }
+
+/* Veg Badge (FSSAI green square + green dot) */
+.veg-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1.8px solid #10b981;
+  border-radius: 3px;
+  background: transparent;
+  padding: 2px;
+  margin-right: 0.45rem;
+  vertical-align: middle;
+}
+
+.veg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+/* Card Meta Chips Row */
+.card-meta-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin: 0.4rem 0 0.85rem;
+}
+
+.meta-chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.18rem 0.55rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.spice-chip {
+  background: rgba(244, 63, 94, 0.12);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.kcal-chip {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.rating-chip {
+  background: rgba(139, 92, 246, 0.12);
+  color: #c084fc;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+/* Dynamic Glowing Borders for Food Cards by Category */
+.food-card[data-category="Breakfast"] { border-top: 3px solid #f59e0b; }
+.food-card[data-category="Meals"] { border-top: 3px solid #10b981; }
+.food-card[data-category="Snacks"] { border-top: 3px solid #f97316; }
+.food-card[data-category="Beverages"] { border-top: 3px solid #06b6d4; }
+.food-card[data-category="Desserts"] { border-top: 3px solid #a855f7; }
+
+/* Active Pipeline Pulse Ripple on Tracking Steps */
+.step-item.active .step-node {
+  box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.35), 0 0 20px var(--primary-glow);
+  animation: stepRipple 2s infinite;
+}
+
+@keyframes stepRipple {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+/* Live Waiting Estimator Pill */
+.queue-wait-estimator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #a7f3d0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  margin-top: 0.5rem;
+}
+
 /* Menu Controls */
 .menu-controls-container {
   display: flex;

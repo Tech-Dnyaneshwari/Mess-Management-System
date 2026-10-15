@@ -123,6 +123,46 @@
         </div>
       </div>
 
+      <!-- SMART MEAL-OF-THE-MOMENT DYNAMIC LIVE WIDGET -->
+      <div class="meal-moment-card" id="meal-moment-widget">
+        <div class="meal-moment-left">
+          <div class="meal-live-pulse-badge">
+            <span class="live-dot-pulse"></span>
+            <span class="live-badge-title">CAMPUS MESS LIVE</span>
+            <span class="live-digital-clock" id="live-digital-clock">--:--:--</span>
+          </div>
+          <div class="meal-greeting-wrap">
+            <h3 class="meal-greeting-title" id="meal-greeting-text">Loading meal specials...</h3>
+            <p class="meal-greeting-desc" id="meal-greeting-desc">Checking current campus kitchen schedule...</p>
+          </div>
+        </div>
+
+        <div class="meal-moment-right">
+          <div class="meal-slots-pills" id="meal-slots-pills-bar">
+            <button class="meal-pill-btn active" data-meal="Breakfast" onclick="applyMealMomentFilter('Breakfast')">
+              <span class="mp-icon">🥞</span>
+              <span class="mp-name">Breakfast</span>
+              <span class="mp-time">7:30 - 11 AM</span>
+            </button>
+            <button class="meal-pill-btn" data-meal="Meals" onclick="applyMealMomentFilter('Meals')">
+              <span class="mp-icon">🍛</span>
+              <span class="mp-name">Lunch</span>
+              <span class="mp-time">12 - 3:30 PM</span>
+            </button>
+            <button class="meal-pill-btn" data-meal="Snacks" onclick="applyMealMomentFilter('Snacks')">
+              <span class="mp-icon">🥪</span>
+              <span class="mp-name">Snacks</span>
+              <span class="mp-time">4 - 7:30 PM</span>
+            </button>
+            <button class="meal-pill-btn" data-meal="All" onclick="applyMealMomentFilter('All')">
+              <span class="mp-icon">🍽️</span>
+              <span class="mp-name">All Items</span>
+              <span class="mp-time">Full Menu</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Controls: Search & Category Chips -->
       <div class="menu-controls-container">
         <div class="search-box-wrapper">
