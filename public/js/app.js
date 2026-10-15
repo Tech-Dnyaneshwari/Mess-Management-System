@@ -1,13 +1,13 @@
 /**
- * SMART CANTEEN MANAGEMENT SYSTEM - FRONTEND APPLICATION LOGIC (PHASE 2)
- * Features: Student Pre-Order + Live Tracker + Kitchen Staff Dashboard + Admin Portal
- * Business Rules: Stock validation, Slot capacity checks, Payment separation, Order cancellation with stock restoration, Role-based headers
+ * MESS MANAGEMENT SYSTEM - FRONTEND APPLICATION LOGIC
+ * Features: Student Pre-Order + Live Tracker + Dedicated Feedback + Kitchen Staff Dashboard + Secure Admin Portal
  */
 
 // Global Application State
 const state = {
   currentView: 'student',
   currentRole: 'student', // 'student' | 'staff' | 'admin'
+  isAdminLoggedIn: sessionStorage.getItem('mess_admin_logged_in') === 'true',
   currentCategory: 'All',
   searchQuery: '',
   menuItems: [],
@@ -15,8 +15,6 @@ const state = {
   trackingToken: null,
   staffOrders: [],
   staffFilter: 'All',
-  paymentFilter: 'All',
-  activeAdminTab: 'reports',
   selectedRating: 5,
   availableSlots: [],
   pollingTimer: null
@@ -51,7 +49,7 @@ function getFoodIcon(imageKey, category) {
 // Helper to make authenticated/role-aware requests
 function apiFetch(url, options = {}) {
   const headers = options.headers || {};
-  headers['x-user-role'] = state.currentRole;
+  headers['x-user-role'] = state.isAdminLoggedIn ? 'admin' : state.currentRole;
   return fetch(url, { ...options, headers });
 }
 
@@ -92,7 +90,7 @@ function switchView(viewName) {
   if (viewName === 'staff') {
     state.currentRole = 'staff';
   } else if (viewName === 'admin') {
-    state.currentRole = 'admin';
+    state.currentRole = state.isAdminLoggedIn ? 'admin' : 'student';
   } else {
     state.currentRole = 'student';
   }
@@ -116,10 +114,12 @@ function switchView(viewName) {
     if (state.trackingToken) {
       lookupOrderByToken(state.trackingToken, true);
     }
+  } else if (viewName === 'feedback') {
+    loadFeedbackView();
   } else if (viewName === 'staff') {
     loadStaffOrders();
   } else if (viewName === 'admin') {
-    loadAdminData();
+    renderAdminPortal();
   }
 
   // Scroll to top
@@ -129,13 +129,14 @@ function switchView(viewName) {
 function updateRoleIndicator() {
   const roleLabel = document.getElementById('current-role-label');
   if (roleLabel) {
-    roleLabel.innerText = state.currentRole.toUpperCase();
-    if (state.currentRole === 'admin') {
+    const displayRole = (state.currentView === 'admin' && state.isAdminLoggedIn) ? 'ADMIN' : state.currentRole.toUpperCase();
+    roleLabel.innerText = displayRole;
+    if (displayRole === 'ADMIN') {
       roleLabel.style.color = 'var(--accent-purple)';
-    } else if (state.currentRole === 'staff') {
+    } else if (displayRole === 'STAFF') {
       roleLabel.style.color = 'var(--accent-amber)';
     } else {
-      roleLabel.style.color = 'var(--primary)';
+      roleLabel.style.color = 'var(--accent-cyan)';
     }
   }
 }
@@ -159,7 +160,7 @@ function startPolling() {
 
 // ==========================================================================
 // 2. SLOTS & CAPACITY MANAGEMENT
-// ==========================================
+// ==========================================================================
 
 async function loadSlots() {
   try {
@@ -260,7 +261,7 @@ function renderMenu() {
   }
 
   if (countBadge) {
-    countBadge.innerText = `${filtered.length} Dishes Available`;
+    countBadge.innerText = `${filtered.length} Items Available`;
   }
 
   if (filtered.length === 0) {
@@ -299,7 +300,7 @@ function renderMenu() {
         <div class="card-details">
           <span class="card-category">${item.category}</span>
           <h3 class="card-name">${item.name}</h3>
-          <p class="card-desc">${item.description || 'Delicious freshly prepared canteen specialty.'}</p>
+          <p class="card-desc">${item.description || 'Delicious freshly prepared mess specialty.'}</p>
 
           <div class="card-footer-row">
             <div class="card-price-wrap">
@@ -760,7 +761,6 @@ function updateStepperUI(order) {
     if (stepElem) {
       stepElem.classList.remove('completed', 'current');
       if (order.status === 'Cancelled') {
-        // Dim out
         stepElem.style.opacity = '0.4';
       } else {
         stepElem.style.opacity = '1';
@@ -786,7 +786,7 @@ function updateStepperUI(order) {
 async function cancelCurrentOrder() {
   if (!state.trackingToken) return;
 
-  if (!confirm(`Are you sure you want to cancel order #${state.trackingToken}?\n\nReserved items will be restored to canteen stock.`)) {
+  if (!confirm(`Are you sure you want to cancel order #${state.trackingToken}?\n\nReserved items will be restored to mess stock.`)) {
     return;
   }
 
@@ -811,7 +811,124 @@ async function cancelCurrentOrder() {
 }
 
 // ==========================================================================
-// 7. CANTEEN STAFF KITCHEN DASHBOARD
+// 7. DEDICATED STUDENT FEEDBACK & REVIEWS VIEW
+// ==========================================================================
+
+async function loadFeedbackView() {
+  try {
+    const res = await apiFetch('/api/feedback');
+    const data = await res.json();
+    if (data.success) {
+      renderPublicFeedback(data.data);
+    }
+  } catch (err) {
+    console.error('Error loading feedback', err);
+  }
+}
+
+function renderPublicFeedback(reviews) {
+  const container = document.getElementById('public-feedback-grid');
+  const avgNum = document.getElementById('feedback-average-num');
+  const starsVisual = document.getElementById('feedback-stars-visual');
+  const totalReviewsLabel = document.getElementById('feedback-total-reviews-label');
+  if (!container) return;
+
+  if (reviews.length > 0) {
+    const avg = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+    if (avgNum) avgNum.innerText = avg;
+    if (starsVisual) starsVisual.innerText = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+    if (totalReviewsLabel) totalReviewsLabel.innerText = `Based on ${reviews.length} student reviews`;
+  }
+
+  if (reviews.length === 0) {
+    container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1 / -1; text-align: center;">No reviews submitted yet. Be the first to share your experience!</p>';
+    return;
+  }
+
+  container.innerHTML = reviews.map(fb => `
+    <div class="fb-card">
+      <div class="fb-card-top">
+        <span class="fb-student-title">${fb.studentName}</span>
+        <span class="fb-stars-display">${'★'.repeat(fb.rating)}${'☆'.repeat(5 - fb.rating)}</span>
+      </div>
+      <p class="fb-comment-text">"${fb.comment || 'Great food and fast pickup!'}"</p>
+      <div class="fb-meta-bottom">
+        <span>Order: <strong>#${fb.orderToken}</strong></span>
+        <span>${new Date(fb.createdAt).toLocaleDateString()}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openGeneralFeedbackModal() {
+  document.getElementById('feedback-order-token-input').value = state.trackingToken || '';
+  setRating(5);
+  document.getElementById('feedback-modal-overlay').classList.add('active');
+}
+
+function openFeedbackModalForCurrentOrder() {
+  if (!state.trackingToken) return;
+  document.getElementById('feedback-order-token-input').value = state.trackingToken;
+  setRating(5);
+  document.getElementById('feedback-modal-overlay').classList.add('active');
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedback-modal-overlay').classList.remove('active');
+}
+
+function setRating(rating) {
+  state.selectedRating = rating;
+  const stars = document.querySelectorAll('#star-rating-selector .star-btn');
+  stars.forEach((s, idx) => {
+    s.classList.toggle('active', idx < rating);
+  });
+
+  const hints = {
+    1: '1 Star - Needs Improvement',
+    2: '2 Stars - Fair',
+    3: '3 Stars - Good',
+    4: '4 Stars - Very Good',
+    5: '5 Stars - Excellent Food & Service!'
+  };
+  document.getElementById('rating-text-hint').innerText = hints[rating] || '';
+}
+
+async function handleFeedbackSubmit(e) {
+  e.preventDefault();
+
+  const token = document.getElementById('feedback-order-token-input').value.trim();
+  const name = document.getElementById('feedback-name').value.trim();
+  const comment = document.getElementById('feedback-comment').value.trim();
+
+  try {
+    const res = await apiFetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderToken: token,
+        studentName: name,
+        rating: state.selectedRating,
+        comment: comment
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showToast('Thank you for rating your meal!', 'success');
+      closeFeedbackModal();
+      document.getElementById('feedback-form').reset();
+      loadFeedbackView();
+    } else {
+      showToast(data.message || 'Failed to submit rating', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to connect to server', 'error');
+  }
+}
+
+// ==========================================================================
+// 8. CANTEEN STAFF KITCHEN DASHBOARD
 // ==========================================================================
 
 async function loadStaffOrders(silent = false) {
@@ -878,7 +995,6 @@ function renderStaffDashboard() {
     const timeText = elapsedMinutes < 1 ? 'Just now' : `${elapsedMinutes}m ago`;
     const isPaid = order.paymentStatus === 'Paid';
 
-    // Action button depending on current state
     let actionButtons = '';
     if (order.status === 'Placed') {
       actionButtons = `
@@ -955,7 +1071,6 @@ function renderStaffDashboard() {
           `).join('')}
         </div>
 
-        <!-- Payment Toggle Button for Staff -->
         <div style="margin-bottom: 0.75rem;">
           ${!isPaid && order.status !== 'Cancelled' ? `
             <button class="btn btn-outline btn-sm btn-block" style="border-color: var(--accent-emerald); color: var(--accent-emerald);" onclick="updatePaymentStatus('${order.id}', 'Paid')">
@@ -1024,7 +1139,7 @@ async function cancelOrderByStaff(orderId) {
     const data = await res.json();
     if (data.success) {
       showToast(data.message, 'success');
-      loadMenu(); // Refresh stock
+      loadMenu();
       loadStaffOrders();
     } else {
       showToast(data.message || 'Cancellation failed', 'error');
@@ -1049,8 +1164,74 @@ function updateHeaderPendingBadge() {
 }
 
 // ==========================================================================
-// 8. ADMIN DASHBOARD (CRUD & REPORTS / ANALYTICS)
+// 9. ADMIN PORTAL (SECURE LOGIN & DASHBOARD)
 // ==========================================================================
+
+function renderAdminPortal() {
+  const loginScreen = document.getElementById('admin-login-screen');
+  const dashboardScreen = document.getElementById('admin-dashboard-screen');
+
+  if (state.isAdminLoggedIn) {
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (dashboardScreen) dashboardScreen.style.display = 'block';
+    state.currentRole = 'admin';
+    updateRoleIndicator();
+    loadAdminData();
+  } else {
+    if (loginScreen) loginScreen.style.display = 'flex';
+    if (dashboardScreen) dashboardScreen.style.display = 'none';
+    state.currentRole = 'student';
+    updateRoleIndicator();
+  }
+}
+
+async function handleAdminLogin(e) {
+  e.preventDefault();
+
+  const user = document.getElementById('admin-user-input').value.trim();
+  const pass = document.getElementById('admin-pass-input').value;
+  const errBox = document.getElementById('admin-login-error');
+  const btn = document.getElementById('btn-admin-login');
+
+  btn.disabled = true;
+  btn.innerText = 'Authenticating...';
+  if (errBox) errBox.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      state.isAdminLoggedIn = true;
+      sessionStorage.setItem('mess_admin_logged_in', 'true');
+      showToast('Admin logged in successfully', 'success');
+      renderAdminPortal();
+    } else {
+      if (errBox) {
+        errBox.innerText = data.message || 'Invalid administrator credentials';
+        errBox.style.display = 'block';
+      }
+      showToast('Authentication failed', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to connect to authentication server', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'Sign In to Admin Dashboard →';
+  }
+}
+
+function handleAdminLogout() {
+  state.isAdminLoggedIn = false;
+  sessionStorage.removeItem('mess_admin_logged_in');
+  showToast('Logged out of Admin Portal', 'info');
+  renderAdminPortal();
+}
 
 function switchAdminTab(tabName) {
   state.activeAdminTab = tabName;
@@ -1064,6 +1245,8 @@ function switchAdminTab(tabName) {
 }
 
 async function loadAdminData() {
+  if (!state.isAdminLoggedIn) return;
+
   try {
     // 1. Stats & KPIs
     const statsRes = await apiFetch('/api/stats');
@@ -1086,6 +1269,13 @@ async function loadAdminData() {
       renderAdminFeedback(fbData.data);
     }
 
+    // 4. Slots Table
+    const slotsRes = await apiFetch('/api/slots');
+    const slotsData = await slotsRes.json();
+    if (slotsData.success) {
+      renderAdminSlotsTable(slotsData.data);
+    }
+
   } catch (err) {
     console.error('Error loading admin data', err);
   }
@@ -1095,6 +1285,7 @@ function renderAdminKPIs(stats) {
   const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
 
   setTxt('kpi-revenue', `₹${stats.totalRevenue}`);
+  setTxt('kpi-revenue-split', `Paid: ₹${stats.paidRevenue || 0} • Pending: ₹${stats.pendingRevenue || 0}`);
   setTxt('kpi-total-orders', stats.totalOrders);
   setTxt('kpi-active-orders', stats.activeOrders);
   setTxt('kpi-rating', `${stats.avgRating} / 5`);
@@ -1130,6 +1321,38 @@ function renderAdminKPIs(stats) {
       </div>
     `).join('');
   }
+}
+
+function renderAdminSlotsTable(slots) {
+  const container = document.getElementById('admin-slots-table-container');
+  if (!container) return;
+
+  container.innerHTML = `
+    <table class="slot-capacity-table">
+      <thead>
+        <tr>
+          <th>Pickup Time Slot</th>
+          <th>Capacity</th>
+          <th>Active Booked</th>
+          <th>Remaining Spots</th>
+          <th>Slot Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${slots.map(s => `
+          <tr>
+            <td><strong>${s.slot}</strong></td>
+            <td>${s.capacity}</td>
+            <td>${s.booked}</td>
+            <td>${s.remaining}</td>
+            <td>
+              ${s.remaining > 0 ? '<span class="stock-tag in-stock">Available</span>' : '<span class="stock-tag out-stock">FULL</span>'}
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
 
 function renderAdminMenuTable(items) {
@@ -1212,7 +1435,7 @@ async function updateStockQuick(id, newStock) {
 }
 
 async function deleteMenuItem(id, name) {
-  if (!confirm(`Are you sure you want to remove "${name}" from the canteen menu?`)) return;
+  if (!confirm(`Are you sure you want to remove "${name}" from the mess menu?`)) return;
   try {
     const res = await apiFetch(`/api/menu/${id}`, { method: 'DELETE' });
     const data = await res.json();
@@ -1324,71 +1547,6 @@ function renderAdminFeedback(feedback) {
       </div>
     </div>
   `).join('');
-}
-
-// ==========================================================================
-// 9. STUDENT FEEDBACK & RATING (ON COLLECTED ORDERS)
-// ==========================================================================
-
-function openFeedbackModalForCurrentOrder() {
-  if (!state.trackingToken) return;
-  document.getElementById('feedback-order-token').value = state.trackingToken;
-  document.getElementById('feedback-token-label').innerText = `#${state.trackingToken}`;
-  setRating(5);
-  document.getElementById('feedback-modal-overlay').classList.add('active');
-}
-
-function closeFeedbackModal() {
-  document.getElementById('feedback-modal-overlay').classList.remove('active');
-}
-
-function setRating(rating) {
-  state.selectedRating = rating;
-  const stars = document.querySelectorAll('#star-rating-selector .star-btn');
-  stars.forEach((s, idx) => {
-    s.classList.toggle('active', idx < rating);
-  });
-
-  const hints = {
-    1: '1 Star - Needs Improvement',
-    2: '2 Stars - Fair',
-    3: '3 Stars - Good',
-    4: '4 Stars - Very Good',
-    5: '5 Stars - Excellent Food & Service!'
-  };
-  document.getElementById('rating-text-hint').innerText = hints[rating] || '';
-}
-
-async function handleFeedbackSubmit(e) {
-  e.preventDefault();
-
-  const token = document.getElementById('feedback-order-token').value;
-  const name = document.getElementById('feedback-name').value.trim() || 'Student';
-  const comment = document.getElementById('feedback-comment').value.trim();
-
-  try {
-    const res = await apiFetch('/api/feedback', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        orderToken: token,
-        studentName: name,
-        rating: state.selectedRating,
-        comment: comment
-      })
-    });
-
-    const data = await res.json();
-    if (data.success) {
-      showToast('Thank you for rating your meal!', 'success');
-      closeFeedbackModal();
-      document.getElementById('feedback-form').reset();
-    } else {
-      showToast(data.message || 'Failed to submit rating', 'error');
-    }
-  } catch (err) {
-    showToast('Failed to connect to server', 'error');
-  }
 }
 
 // ==========================================================================

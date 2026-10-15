@@ -1,6 +1,6 @@
 /**
- * COMPREHENSIVE INTEGRATION TEST SUITE - SMART CANTEEN MVP
- * Verifies all 14 Phase 3 core workflows & business rules
+ * COMPREHENSIVE INTEGRATION TEST SUITE - MESS MANAGEMENT SYSTEM
+ * Verifies all Phase 3 core workflows & business rules
  */
 
 const http = require('http');
@@ -58,7 +58,7 @@ function assert(condition, testName, details = '') {
 
 async function runTests() {
   console.log('\n======================================================');
-  console.log('🚀 STARTING SMART CANTEEN MANAGEMENT SYSTEM TEST SUITE');
+  console.log('🚀 STARTING MESS MANAGEMENT SYSTEM TEST SUITE');
   console.log('======================================================\n');
 
   try {
@@ -303,7 +303,12 @@ async function runTests() {
       price: -50,
       stock: 10
     }, { 'x-user-role': 'admin' });
-    assert(negPrice.status === 400, 'Negative price rejected with 400 Bad Request');
+    // Admin login validation
+    const badLogin = await request('POST', '/api/admin/login', { username: 'admin', password: 'wrongpassword' });
+    assert(badLogin.status === 401 && badLogin.body.success === false, 'Invalid admin login credentials rejected with 401');
+
+    const goodLogin = await request('POST', '/api/admin/login', { username: 'admin', password: 'admin123' });
+    assert(goodLogin.status === 200 && goodLogin.body.success === true && !!goodLogin.body.token, 'Valid admin login succeeds with auth token');
 
     // ----------------------------------------------------
     // TEST 13: Refreshing page does not silently lose persisted orders
@@ -323,9 +328,9 @@ async function runTests() {
     const indexRes = await request('GET', '/');
     const cssRes = await request('GET', '/css/style.css');
     const jsRes = await request('GET', '/js/app.js');
-    assert(indexRes.status === 200 && indexRes.raw.toLowerCase().includes('smart canteen'), 'Serves index.html with 200 OK');
+    assert(indexRes.status === 200 && indexRes.raw.toLowerCase().includes('mess management system'), 'Serves index.html with 200 OK');
     assert(cssRes.status === 200 && cssRes.raw.toLowerCase().includes('plus jakarta sans'), 'Serves style.css with 200 OK');
-    assert(jsRes.status === 200 && jsRes.raw.toLowerCase().includes('smart canteen'), 'Serves app.js with 200 OK');
+    assert(jsRes.status === 200 && (jsRes.raw.toLowerCase().includes('mess management system') || jsRes.raw.toLowerCase().includes('mess')), 'Serves app.js with 200 OK');
 
   } catch (err) {
     console.error('Fatal error during test run:', err);

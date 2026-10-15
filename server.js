@@ -84,6 +84,33 @@ function requireRole(allowedRoles) {
 }
 
 // ==========================================
+// 0. AUTHENTICATION (ADMIN LOGIN)
+// ==========================================
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
+
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'Username and password are required' });
+  }
+
+  if (username.trim() === ADMIN_USER && password === ADMIN_PASS) {
+    return res.json({
+      success: true,
+      message: 'Admin authentication successful',
+      token: 'admin-token-' + Date.now(),
+      admin: { username: ADMIN_USER, role: 'admin' }
+    });
+  }
+
+  return res.status(401).json({
+    success: false,
+    message: 'Invalid administrator credentials. (Default: admin / admin123)'
+  });
+});
+
+// ==========================================
 // 1. SLOTS & CAPACITY ENDPOINTS
 // ==========================================
 
@@ -671,7 +698,7 @@ app.get('*', (req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`=======================================================`);
-  console.log(`🍽️  Smart Canteen Management System is LIVE!`);
+  console.log(`🍽️  Mess Management System is LIVE!`);
   console.log(`📡 URL: http://localhost:${PORT}`);
   console.log(`📁 Database: ${DB_PATH}`);
   console.log(`⏱️  Slot Capacity Limit: ${SLOT_CAPACITY} orders/slot`);

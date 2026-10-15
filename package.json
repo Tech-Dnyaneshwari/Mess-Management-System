@@ -1,7 +1,7 @@
 {
-  "name": "smart-canteen-management-system",
+  "name": "mess-management-system",
   "version": "1.0.0",
-  "description": "Smart Canteen Management System - College CEP Project",
+  "description": "Mess Management System - Meal Pre-Ordering, Kitchen Automation & Administration",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

@@ -1,5 +1,5 @@
-# Smart Canteen Management System
-> **College CEP Project** | Demonstrable, Production-Ready College Pre-Ordering & Management System
+# Mess Management System
+> Demonstrable, Production-Ready College Pre-Ordering & Mess Management System
 
 ---
 
