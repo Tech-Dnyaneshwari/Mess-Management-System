@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const QRCode = require('qrcode');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -311,7 +312,7 @@ app.get('/api/orders', (req, res) => {
 });
 
 // GET /api/orders/:tokenOrId - Live tracking lookup
-app.get('/api/orders/:tokenOrId', (req, res) => {
+app.get('/api/orders/:tokenOrId', async (req, res) => {
   const param = req.params.tokenOrId.trim().toUpperCase();
   const db = readDB();
   
@@ -325,12 +326,51 @@ app.get('/api/orders/:tokenOrId', (req, res) => {
   if (!order) {
     return res.status(404).json({ success: false, message: `Order with token or ID "${req.params.tokenOrId}" not found.` });
   }
+
+  // Ensure order has QR code data URL
+  if (!order.qrDataUrl) {
+    try {
+      const qrTrackUrl = `${req.protocol}://${req.get('host') || 'localhost:3000'}/?track=${order.token}`;
+      order.qrDataUrl = await QRCode.toDataURL(qrTrackUrl, {
+        width: 260,
+        margin: 1.5,
+        color: { dark: '#050914', light: '#ffffff' }
+      });
+      order.qrTrackUrl = qrTrackUrl;
+    } catch (e) {}
+  }
   
   res.json({ success: true, data: order });
 });
 
+// GET /api/orders/:tokenOrId/qr - Dedicated QR Code Endpoint
+app.get('/api/orders/:tokenOrId/qr', async (req, res) => {
+  const param = req.params.tokenOrId.trim().toUpperCase();
+  const db = readDB();
+  const order = (db.orders || []).find(o => 
+    o.token.toUpperCase() === param || 
+    o.token.toUpperCase() === `YR-${param.replace(/^(YR|SC)-?/, '')}` ||
+    o.token.toUpperCase() === `SC-${param.replace(/^(YR|SC)-?/, '')}` ||
+    o.id.toUpperCase() === param
+  );
+  if (!order) {
+    return res.status(404).json({ success: false, message: 'Order not found' });
+  }
+  try {
+    const qrTrackUrl = `${req.protocol}://${req.get('host') || 'localhost:3000'}/?track=${order.token}`;
+    const qrDataUrl = await QRCode.toDataURL(qrTrackUrl, {
+      width: 280,
+      margin: 1.5,
+      color: { dark: '#050914', light: '#ffffff' }
+    });
+    res.json({ success: true, token: order.token, qrDataUrl, trackUrl: qrTrackUrl });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to generate QR code', error: err.message });
+  }
+});
+
 // POST /api/orders - Create Pre-Order (Student)
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', async (req, res) => {
   const { studentName, rollNumber, phone, pickupSlot, items } = req.body;
   
   if (!studentName || !studentName.trim()) {
@@ -401,11 +441,23 @@ app.post('/api/orders', (req, res) => {
     });
   }
   
-  // 3. Generate unique order token
+  // 3. Generate unique order token & QR Code
   const tokenNum = db.nextOrderNumber || 1001;
   const token = `YR-${tokenNum}`;
   db.nextOrderNumber = tokenNum + 1;
   
+  const qrTrackUrl = `${req.protocol}://${req.get('host') || 'localhost:3000'}/?track=${token}`;
+  let qrDataUrl = '';
+  try {
+    qrDataUrl = await QRCode.toDataURL(qrTrackUrl, {
+      width: 260,
+      margin: 1.5,
+      color: { dark: '#050914', light: '#ffffff' }
+    });
+  } catch (e) {
+    console.warn('QR code generation failed:', e);
+  }
+
   const now = new Date().toISOString();
   const newOrder = {
     id: 'ord-' + tokenNum,
@@ -420,6 +472,8 @@ app.post('/api/orders', (req, res) => {
     createdAt: now,
     totalAmount: totalAmount, // Trusted DB calculated sum
     items: verifiedItems,
+    qrDataUrl: qrDataUrl,
+    qrTrackUrl: qrTrackUrl,
     statusHistory: [
       { status: 'Placed', time: now }
     ]

@@ -81,6 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Start background live polling (every 4 seconds)
   startPolling();
+
+  // Check URL query parameters for direct QR scan tracking (?track=YR-XXXX)
+  const urlParams = new URLSearchParams(window.location.search);
+  const trackToken = urlParams.get('track');
+  if (trackToken) {
+    state.trackingToken = trackToken;
+    switchView('tracking');
+    lookupOrderByToken(trackToken);
+    showToast(`Displaying scanned order token #${trackToken}`, 'info');
+  }
 });
 
 function switchView(viewName) {
@@ -570,9 +580,18 @@ async function handleCheckoutSubmit(e) {
 }
 
 function showSuccessModal(order) {
+  state.lastCreatedOrder = order;
+  state.currentTrackedOrder = order;
   document.getElementById('success-token-code').innerText = `#${order.token}`;
   document.getElementById('success-token-slot').innerText = order.pickupSlot;
   document.getElementById('success-total-amount').innerText = `₹${order.totalAmount}`;
+  
+  // Set QR code image
+  const qrImg = document.getElementById('success-qr-image');
+  if (qrImg && order.qrDataUrl) {
+    qrImg.src = order.qrDataUrl;
+  }
+  
   document.getElementById('success-modal-overlay').classList.add('active');
 }
 
@@ -583,6 +602,73 @@ function closeSuccessModal() {
 function viewPlacedOrderInTracker() {
   closeSuccessModal();
   switchView('tracking');
+}
+
+// QR Code Enlarged View Modal
+function openQrExpandedModal(orderToUse = null) {
+  const order = orderToUse || state.currentTrackedOrder || state.lastCreatedOrder;
+  if (!order) {
+    showToast('No active order token to display QR code', 'info');
+    return;
+  }
+  const modal = document.getElementById('qr-modal-overlay');
+  const img = document.getElementById('qr-enlarged-img');
+  const title = document.getElementById('qr-modal-token-title');
+  const sub = document.getElementById('qr-modal-token-sub');
+  const urlDisplay = document.getElementById('qr-modal-url-display');
+
+  if (title) title.innerText = `Token #${order.token} QR Code`;
+  if (sub) sub.innerText = `#${order.token}`;
+  if (img) img.src = order.qrDataUrl || '';
+  if (urlDisplay) urlDisplay.innerText = order.qrTrackUrl || `${window.location.origin}/?track=${order.token}`;
+
+  if (modal) modal.classList.add('active');
+}
+
+function closeQrExpandedModal() {
+  const modal = document.getElementById('qr-modal-overlay');
+  if (modal) modal.classList.remove('active');
+}
+
+// Print Order Token Voucher Slip
+function printOrderTokenReceipt(orderToUse = null) {
+  const order = orderToUse || state.lastCreatedOrder || state.currentTrackedOrder;
+  if (!order) {
+    showToast('No active order available to print voucher', 'info');
+    return;
+  }
+  
+  document.getElementById('receipt-token').innerText = `#${order.token}`;
+  document.getElementById('receipt-date').innerText = new Date(order.createdAt || Date.now()).toLocaleString();
+  document.getElementById('receipt-student').innerText = order.studentName || 'Student';
+  document.getElementById('receipt-roll').innerText = order.rollNumber || 'N/A';
+  document.getElementById('receipt-slot').innerText = order.pickupSlot || 'Counter Pickup';
+  document.getElementById('receipt-payment-status').innerText = order.paymentStatus || 'Pending';
+  document.getElementById('receipt-total').innerText = `₹${order.totalAmount || 0}`;
+
+  const qrImg = document.getElementById('receipt-qr-img');
+  if (qrImg && order.qrDataUrl) {
+    qrImg.src = order.qrDataUrl;
+  }
+
+  const tbody = document.getElementById('receipt-items-tbody');
+  if (tbody && Array.isArray(order.items)) {
+    tbody.innerHTML = order.items.map(it => `
+      <tr>
+        <td style="padding: 0.35rem 0;">${it.name}</td>
+        <td style="padding: 0.35rem 0; text-align: center;">${it.quantity}</td>
+        <td style="padding: 0.35rem 0; text-align: right;">₹${it.subtotal || (it.price * it.quantity)}</td>
+      </tr>
+    `).join('');
+  }
+
+  const receiptModal = document.getElementById('receipt-modal-overlay');
+  if (receiptModal) receiptModal.classList.add('active');
+}
+
+function closeReceiptModal() {
+  const receiptModal = document.getElementById('receipt-modal-overlay');
+  if (receiptModal) receiptModal.classList.remove('active');
 }
 
 function saveRecentToken(token) {
@@ -675,6 +761,14 @@ function renderTrackingDetails(order) {
     : 'Recently';
   document.getElementById('track-time-display').innerText = `Placed at ${placedTime}`;
   
+  state.currentTrackedOrder = order;
+
+  // Set QR Code thumbnail in tracking header
+  const trackQrImg = document.getElementById('track-qr-img');
+  if (trackQrImg && order.qrDataUrl) {
+    trackQrImg.src = order.qrDataUrl;
+  }
+
   const statusPill = document.getElementById('track-status-pill');
   statusPill.innerText = order.status;
   statusPill.className = `current-status-badge status-${order.status.replace(/\s+/g, '')}`;

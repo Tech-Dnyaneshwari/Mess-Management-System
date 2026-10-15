@@ -2356,3 +2356,217 @@ input:checked + .slider:before { transform: translateX(20px); }
   .form-group.full-width { grid-column: span 1; }
   .cart-drawer { max-width: 100%; }
 }
+
+/* ==========================================================================
+   QR CODE TOKEN COMPONENT & ENLARGED MODAL
+   ========================================================================== */
+.token-qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.15rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.qr-image-wrapper {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  background: #ffffff;
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.token-qr-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Subtle Animated Laser Scan Line */
+.qr-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #3b82f6, #06b6d4, transparent);
+  box-shadow: 0 0 10px #06b6d4;
+  animation: qrScan 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes qrScan {
+  0% { top: 4px; }
+  100% { top: 160px; }
+}
+
+.qr-instructions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.qr-instructions strong {
+  color: var(--accent-cyan);
+}
+
+/* Live Tracker QR Banner Badge */
+.token-banner-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(16, 23, 53, 0.95);
+  border: 1px solid var(--border-card);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin: 0 0.5rem;
+}
+
+.token-banner-qr:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px var(--primary-glow);
+}
+
+.qr-thumbnail-box {
+  width: 60px;
+  height: 60px;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.qr-thumb-caption {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  white-space: nowrap;
+}
+
+/* Enlarged QR Modal */
+.qr-modal-box {
+  max-width: 360px;
+  text-align: center;
+  background: #0d1430;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+}
+
+.qr-enlarged-wrapper {
+  background: #ffffff;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  margin: 1.25rem auto;
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+.qr-enlarged-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Printable Token Receipt Modal / Print Preview */
+.receipt-printable-slip {
+  background: #ffffff;
+  color: #111827;
+  padding: 1.75rem;
+  border-radius: var(--radius-md);
+  max-width: 380px;
+  margin: 0 auto;
+  font-family: var(--font-sans);
+  border: 2px dashed #94a3b8;
+}
+
+.receipt-header {
+  text-align: center;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.receipt-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.receipt-subtitle {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.receipt-token-badge {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #2563eb;
+  letter-spacing: 0.05em;
+  margin: 0.5rem 0;
+}
+
+.receipt-table {
+  width: 100%;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  border-collapse: collapse;
+}
+
+.receipt-table td {
+  padding: 0.35rem 0;
+}
+
+.receipt-table .rt-total {
+  border-top: 1px solid #cbd5e1;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.receipt-qr-box {
+  width: 140px;
+  height: 140px;
+  margin: 1rem auto 0.5rem auto;
+}
+
+.receipt-qr-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.receipt-footer-note {
+  font-size: 0.72rem;
+  color: #64748b;
+  text-align: center;
+  margin-top: 0.75rem;
+}

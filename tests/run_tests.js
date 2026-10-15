@@ -137,6 +137,10 @@ async function runTests() {
     });
     const orderData = validOrder.body.data;
     assert(validOrder.status === 201 && /^YR-\d+$/.test(orderData.token), 'Order assigned unique token format (e.g. YR-1007)', orderData.token);
+    assert(!!orderData.qrDataUrl && orderData.qrDataUrl.startsWith('data:image/png;base64,'), 'Order generated with valid base64 QR code image');
+
+    const qrEndpointRes = await request('GET', `/api/orders/${orderData.token}/qr`);
+    assert(qrEndpointRes.status === 200 && qrEndpointRes.body.success === true && !!qrEndpointRes.body.qrDataUrl, 'Dedicated QR code endpoint returns 200 and image');
 
     // ----------------------------------------------------
     // TEST 5: The order appears in the staff dashboard

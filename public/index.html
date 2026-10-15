@@ -190,6 +190,15 @@
               <h3 class="token-number-big" id="track-token-display">#YR-1001</h3>
               <span class="token-time-tag" id="track-time-display">Placed at 12:30 PM</span>
             </div>
+
+            <!-- Interactive Counter QR Thumbnail (Click to Enlarge) -->
+            <div class="token-banner-qr" id="track-qr-badge" onclick="openQrExpandedModal()" title="Click to enlarge QR code for counter scanner">
+              <div class="qr-thumbnail-box">
+                <img id="track-qr-img" class="qr-thumb-img" src="" alt="Token QR">
+              </div>
+              <span class="qr-thumb-caption">📷 Counter QR</span>
+            </div>
+
             <div class="token-banner-right">
               <span class="current-status-badge" id="track-status-pill">Preparing</span>
               <div class="pickup-slot-highlight">
@@ -768,6 +777,18 @@
         <div class="token-slot-pill">
           🕒 Pickup Slot: <strong id="success-token-slot">12:45 PM</strong>
         </div>
+
+        <!-- Token QR Code Section -->
+        <div class="token-qr-section" id="success-qr-section">
+          <div class="qr-image-wrapper" onclick="openQrExpandedModal()" title="Click to view full size">
+            <img id="success-qr-image" class="token-qr-img" src="" alt="Order Token QR Code">
+            <div class="qr-scan-line"></div>
+          </div>
+          <div class="qr-instructions">
+            <span>📷</span>
+            <span>Scan at mess counter for <strong>instant verification</strong></span>
+          </div>
+        </div>
       </div>
 
       <div class="success-meta-row">
@@ -781,9 +802,12 @@
         </div>
       </div>
 
-      <div class="modal-footer justify-center">
+      <div class="modal-footer justify-center" style="gap: 0.65rem; flex-wrap: wrap;">
         <button class="btn btn-primary btn-lg" onclick="viewPlacedOrderInTracker()">
           📍 Track Live Status Now
+        </button>
+        <button class="btn btn-outline" onclick="printOrderTokenReceipt()" title="Print / Save KOT Token Voucher">
+          🖨️ Print Slip
         </button>
         <button class="btn btn-outline" onclick="closeSuccessModal()">
           Back to Menu
@@ -902,7 +926,90 @@
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
+  <!-- ============================================================== -->
+  <!-- ENLARGED QR CODE MODAL (FOR COUNTER SCANNER)                   -->
+  <!-- ============================================================== -->
+  <div class="modal-overlay" id="qr-modal-overlay">
+    <div class="modal-box qr-modal-box">
+      <div class="modal-header">
+        <h4 id="qr-modal-token-title">Token QR Code</h4>
+        <button class="modal-close-btn" onclick="closeQrExpandedModal()">✕</button>
+      </div>
+      <div class="modal-body" style="padding-top: 0.5rem;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Present this code directly to the scanner at the pickup counter:</span>
+        <div class="qr-enlarged-wrapper">
+          <img id="qr-enlarged-img" src="" alt="High-contrast QR Code">
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; color: var(--primary);" id="qr-modal-token-sub">
+          #YR-1004
+        </div>
+        <p style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.35rem;">
+          Direct verification link: <span id="qr-modal-url-display" style="color: var(--accent-cyan); word-break: break-all;"></span>
+        </p>
+      </div>
+      <div class="modal-footer justify-center">
+        <button class="btn btn-primary btn-block" onclick="closeQrExpandedModal()">Done / Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- PRINTABLE RECEIPT / VOUCHER MODAL                              -->
+  <!-- ============================================================== -->
+  <div class="modal-overlay" id="receipt-modal-overlay">
+    <div class="modal-box" style="max-width: 440px; background: #0f172a; padding: 1.5rem;">
+      <div class="modal-header">
+        <h4>Order Token Voucher</h4>
+        <button class="modal-close-btn" onclick="closeReceiptModal()">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 0.75rem 0;">
+        <div class="receipt-printable-slip" id="printable-slip-content">
+          <div class="receipt-header">
+            <h3 class="receipt-title">Mess Management System</h3>
+            <p class="receipt-subtitle">Kitchen Order Token (KOT)</p>
+            <div class="receipt-token-badge" id="receipt-token">#YR-1004</div>
+            <div style="font-size: 0.82rem; color: #475569;" id="receipt-date">--</div>
+          </div>
+
+          <div style="font-size: 0.85rem; margin-bottom: 0.75rem;">
+            <div><strong>Student:</strong> <span id="receipt-student">--</span> (<span id="receipt-roll">--</span>)</div>
+            <div><strong>Pickup Slot:</strong> <span id="receipt-slot" style="color: #2563eb; font-weight: 700;">--</span></div>
+            <div><strong>Payment:</strong> Cash at Pickup Counter (<span id="receipt-payment-status">Pending</span>)</div>
+          </div>
+
+          <table class="receipt-table">
+            <thead>
+              <tr style="border-bottom: 1px solid #cbd5e1; font-weight: 700;">
+                <td style="text-align: left;">Item</td>
+                <td style="text-align: center;">Qty</td>
+                <td style="text-align: right;">Amount</td>
+              </tr>
+            </thead>
+            <tbody id="receipt-items-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+            <tfoot>
+              <tr class="rt-total">
+                <td colspan="2">Grand Total:</td>
+                <td style="text-align: right;" id="receipt-total">₹0</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <div class="receipt-qr-box">
+            <img id="receipt-qr-img" src="" alt="Token QR Code">
+          </div>
+          <div class="receipt-footer-note">
+            Please show this token QR at the mess pickup counter to collect your meal. Thank you!
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button class="btn btn-outline" onclick="closeReceiptModal()">Close</button>
+        <button class="btn btn-primary" onclick="window.print()">Print Receipt 🖨️</button>
+      </div>
+    </div>
+  </div>
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- JAVASCRIPT LOGIC -->
