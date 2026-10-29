@@ -66,8 +66,17 @@
         </button>
       </nav>
 
-      <!-- Header Actions (Role badge and Cart cleanly separated) -->
+      <!-- Header Actions (Role badge, Theme switcher, and Cart cleanly separated) -->
       <div class="header-right-group">
+        <div class="theme-select-wrapper" title="Change Color Palette">
+          <select id="theme-selector" class="theme-select-dropdown" onchange="changeColorTheme(this.value)" aria-label="Select Color Theme">
+            <option value="warm-amber" selected>🌅 Sunset Amber</option>
+            <option value="gourmet-gold">☀️ Gourmet Gold</option>
+            <option value="crimson-feast">🍷 Crimson Feast</option>
+            <option value="emerald-bistro">🍃 Emerald Bistro</option>
+          </select>
+        </div>
+
         <div class="role-pill-badge" id="role-badge-display">
           <span class="role-pulse-dot"></span>
           <span class="role-text-label">Role: <strong id="current-role-label">STUDENT</strong></span>
@@ -851,8 +860,11 @@
   <!-- ============================================================== -->
   <!-- ORDER SUCCESS / TOKEN CONFIRMATION MODAL                       -->
   <!-- ============================================================== -->
-  <div class="modal-overlay" id="success-modal-overlay">
-    <div class="modal-box success-modal text-center">
+  <div class="modal-overlay" id="success-modal-overlay" onclick="if(event.target === this) exitToExploreMenu()">
+    <div class="modal-box success-modal text-center" style="position: relative;">
+      <!-- Top Exit / Dismiss Button -->
+      <button class="modal-close-btn" onclick="exitToExploreMenu()" id="btn-success-modal-close" title="Exit & Explore More Dishes" aria-label="Exit & Explore More">✕</button>
+
       <div class="success-confetti">🎉</div>
       <h3 class="success-heading">Pre-Order Placed Successfully!</h3>
       <p class="success-subtext">Show this token at the mess counter when collecting your food.</p>
@@ -888,15 +900,16 @@
         </div>
       </div>
 
-      <div class="modal-footer justify-center" style="gap: 0.65rem; flex-wrap: wrap;">
-        <button class="btn btn-primary btn-lg" onclick="viewPlacedOrderInTracker()">
-          📍 Track Live Status Now
+      <div class="modal-footer justify-center" style="gap: 0.75rem; flex-wrap: wrap;">
+        <!-- Prominent Exit & Explore More Button -->
+        <button class="btn btn-primary btn-lg" onclick="exitToExploreMenu()" id="btn-explore-more">
+          🍽️ Exit & Explore More Dishes
         </button>
-        <button class="btn btn-outline" onclick="printOrderTokenReceipt()" title="Print / Save KOT Token Voucher">
+        <button class="btn btn-secondary btn-lg" onclick="viewPlacedOrderInTracker()" id="btn-track-live">
+          📍 Track Live Status
+        </button>
+        <button class="btn btn-outline" onclick="printOrderTokenReceipt()" title="Print / Save KOT Token Voucher" id="btn-print-slip">
           🖨️ Print Slip
-        </button>
-        <button class="btn btn-outline" onclick="closeSuccessModal()">
-          Back to Menu
         </button>
       </div>
     </div>

@@ -25,6 +25,18 @@ const AVAILABLE_SLOTS = [
   '02:00 PM'
 ];
 
+// Helper to determine if an order counts as active in a pickup slot
+function isOrderActiveInSlot(order, slot) {
+  if (!order || order.pickupSlot !== slot) return false;
+  if (['Cancelled', 'Collected'].includes(order.status)) return false;
+  // Expire slots for orders older than 16 hours so old test/demo orders don't lock future operations
+  if (order.createdAt) {
+    const ageHours = (Date.now() - new Date(order.createdAt).getTime()) / (1000 * 60 * 60);
+    if (ageHours > 16) return false;
+  }
+  return true;
+}
+
 // Database helper functions with safe atomic file operations
 function readDB() {
   try {
@@ -121,11 +133,8 @@ app.get('/api/slots', (req, res) => {
   const orders = db.orders || [];
 
   const slotsStatus = AVAILABLE_SLOTS.map(slot => {
-    // Count active orders in slot (exclude cancelled or collected)
-    const activeInSlot = orders.filter(o => 
-      o.pickupSlot === slot && 
-      !['Cancelled', 'Collected'].includes(o.status)
-    ).length;
+    // Count active orders in slot (exclude cancelled or collected or expired)
+    const activeInSlot = orders.filter(o => isOrderActiveInSlot(o, slot)).length;
 
     const remaining = Math.max(0, SLOT_CAPACITY - activeInSlot);
 
@@ -222,6 +231,16 @@ app.put('/api/menu/:id', requireRole(['admin']), (req, res) => {
   const existing = db.menu[idx];
   const updatedStock = stock !== undefined ? Math.max(0, Number(stock)) : existing.stock;
   
+  // If stock is increased above 0 and isAvailable wasn't explicitly provided, restore availability
+  let updatedAvailability = existing.isAvailable;
+  if (isAvailable !== undefined) {
+    updatedAvailability = Boolean(isAvailable);
+  } else if (updatedStock > 0 && (existing.stock === 0 || !existing.isAvailable)) {
+    updatedAvailability = true;
+  } else if (updatedStock === 0) {
+    updatedAvailability = false;
+  }
+
   db.menu[idx] = {
     ...existing,
     name: name !== undefined ? name.trim() : existing.name,
@@ -229,7 +248,7 @@ app.put('/api/menu/:id', requireRole(['admin']), (req, res) => {
     price: price !== undefined ? Number(price) : existing.price,
     description: description !== undefined ? description.trim() : existing.description,
     stock: updatedStock,
-    isAvailable: isAvailable !== undefined ? Boolean(isAvailable) : (updatedStock > 0 ? existing.isAvailable : false),
+    isAvailable: updatedAvailability,
     prepTime: prepTime !== undefined ? prepTime.trim() : existing.prepTime,
     badge: badge !== undefined ? badge.trim() : existing.badge
   };
@@ -250,12 +269,16 @@ app.patch('/api/menu/:id/toggle', requireRole(['admin']), (req, res) => {
     return res.status(404).json({ success: false, message: 'Menu item not found' });
   }
   
-  if (isAvailable !== undefined) {
-    item.isAvailable = Boolean(isAvailable);
-  }
   if (stockAdjustment !== undefined) {
     item.stock = Math.max(0, item.stock + Number(stockAdjustment));
-    if (item.stock === 0) item.isAvailable = false;
+    if (item.stock === 0) {
+      item.isAvailable = false;
+    } else if (item.stock > 0 && isAvailable === undefined && !item.isAvailable) {
+      item.isAvailable = true;
+    }
+  }
+  if (isAvailable !== undefined) {
+    item.isAvailable = Boolean(isAvailable);
   }
   
   writeDB(db);
@@ -337,6 +360,7 @@ app.get('/api/orders/:tokenOrId', async (req, res) => {
         color: { dark: '#050914', light: '#ffffff' }
       });
       order.qrTrackUrl = qrTrackUrl;
+      writeDB(db);
     } catch (e) {}
   }
   
@@ -388,11 +412,33 @@ app.post('/api/orders', async (req, res) => {
   
   const db = readDB();
 
-  // 1. Pickup Slot Capacity Check (max 5 active orders per slot)
-  const activeInSlot = (db.orders || []).filter(o => 
-    o.pickupSlot === pickupSlot && 
-    !['Cancelled', 'Collected'].includes(o.status)
-  ).length;
+  // 1. Validate stock & calculate price strictly from database records (never trust client price)
+  // Aggregate quantities per item to handle duplicate IDs in cart safely
+  const aggregatedQuantities = {};
+  for (const cartItem of items) {
+    const qty = parseInt(cartItem.quantity, 10);
+    if (isNaN(qty) || qty <= 0) {
+      return res.status(400).json({ success: false, message: 'Item quantity must be a positive integer.' });
+    }
+    aggregatedQuantities[cartItem.id] = (aggregatedQuantities[cartItem.id] || 0) + qty;
+  }
+
+  // First Pass: Validate that all requested items exist, are available, and have sufficient total stock
+  for (const [itemId, totalQty] of Object.entries(aggregatedQuantities)) {
+    const menuItem = db.menu.find(m => m.id === itemId);
+    if (!menuItem) {
+      return res.status(400).json({ success: false, message: `Item "${itemId}" not found in menu.` });
+    }
+    if (!menuItem.isAvailable || menuItem.stock < totalQty) {
+      return res.status(400).json({
+        success: false,
+        message: `Sorry, "${menuItem.name}" is out of stock or does not have ${totalQty} portions available (Available: ${menuItem.stock}).`
+      });
+    }
+  }
+
+  // 2. Pickup Slot Capacity Check (max 5 active orders per slot)
+  const activeInSlot = (db.orders || []).filter(o => isOrderActiveInSlot(o, pickupSlot)).length;
 
   if (activeInSlot >= SLOT_CAPACITY) {
     return res.status(400).json({ 
@@ -400,27 +446,14 @@ app.post('/api/orders', async (req, res) => {
       message: `Pickup slot "${pickupSlot}" has reached maximum capacity (${SLOT_CAPACITY}/${SLOT_CAPACITY} orders). Please select another available time slot.` 
     });
   }
-  
-  // 2. Validate stock & calculate price strictly from database records (never trust client price)
+
+  // 3. Second Pass: Decrement stock safely and build verified items list
   const verifiedItems = [];
   let totalAmount = 0;
   
   for (const cartItem of items) {
     const qty = parseInt(cartItem.quantity, 10);
-    if (isNaN(qty) || qty <= 0) {
-      return res.status(400).json({ success: false, message: 'Item quantity must be a positive integer.' });
-    }
-
     const menuItem = db.menu.find(m => m.id === cartItem.id);
-    if (!menuItem) {
-      return res.status(400).json({ success: false, message: `Item "${cartItem.name || cartItem.id}" not found in menu.` });
-    }
-    if (!menuItem.isAvailable || menuItem.stock < qty) {
-      return res.status(400).json({ 
-        success: false, 
-        message: `Sorry, "${menuItem.name}" is out of stock or does not have ${qty} portions available (Available: ${menuItem.stock}).` 
-      });
-    }
     
     // Decrement stock safely; prevent negative stock
     menuItem.stock = Math.max(0, menuItem.stock - qty);
@@ -667,6 +700,18 @@ app.get('/api/feedback', (req, res) => {
 // ==========================================
 // 5. REPORTS & ANALYTICS ENDPOINT
 // ==========================================
+
+// POST /api/admin/replenish-stock - Quick Restock & Refresh All Items
+app.post('/api/admin/replenish-stock', requireRole(['admin']), (req, res) => {
+  const db = readDB();
+  const targetStock = Math.max(10, Number(req.body.stock) || 35);
+  (db.menu || []).forEach(item => {
+    item.stock = targetStock;
+    item.isAvailable = true;
+  });
+  writeDB(db);
+  res.json({ success: true, message: `All ${db.menu.length} menu items restocked to ${targetStock} units.` });
+});
 
 // GET /api/stats - Admin Canteen Analytics
 app.get('/api/stats', (req, res) => {

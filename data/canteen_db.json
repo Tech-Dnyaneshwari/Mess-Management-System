@@ -7,7 +7,7 @@
       "price": 50,
       "description": "Crispy golden crepe served with spiced potato masala, coconut chutney, and piping hot sambar.",
       "image": "dosa",
-      "stock": 2,
+      "stock": 29,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "Bestseller"
@@ -19,7 +19,7 @@
       "price": 30,
       "description": "Classic spiced potato fritters encased in soft pav with garlic chutney and fried green chillies.",
       "image": "vadapav",
-      "stock": 5,
+      "stock": 31,
       "isAvailable": true,
       "prepTime": "5 mins",
       "badge": "Popular"
@@ -31,7 +31,7 @@
       "price": 35,
       "description": "Crisp flaky samosas stuffed with seasoned potatoes and peas, served in buttered pav.",
       "image": "samosa",
-      "stock": 29,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "5 mins",
       "badge": "Hot"
@@ -43,7 +43,7 @@
       "price": 60,
       "description": "Triple-layered toasted bread stuffed with crunchy garden vegetables, mint chutney, and gooey cheese.",
       "image": "sandwich",
-      "stock": 18,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "8 mins",
       "badge": "Must Try"
@@ -55,7 +55,7 @@
       "price": 120,
       "description": "Rich paneer gravy, 3 butter rotis, aromatic jeera rice, dal tadka, salad, and sweet gulab jamun.",
       "image": "thali",
-      "stock": 15,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "12 mins",
       "badge": "Chef Special"
@@ -67,7 +67,7 @@
       "price": 110,
       "description": "Fragrant basmati rice layered with marinated vegetables, mint, caramelized onions, and cucumber raita.",
       "image": "biryani",
-      "stock": 21,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "Bestseller"
@@ -79,7 +79,7 @@
       "price": 85,
       "description": "Fluffy puffed bhatures served with spicy Amritsari chole, pickled onions, and lemon.",
       "image": "chole",
-      "stock": 12,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "Popular"
@@ -91,7 +91,7 @@
       "price": 45,
       "description": "College favorite 2-minute noodles tossed with spicy veggie masala and topped with melted cheese.",
       "image": "maggi",
-      "stock": 50,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "7 mins",
       "badge": "Student Fav"
@@ -103,7 +103,7 @@
       "price": 50,
       "description": "Rich blended espresso and creamy chilled milk topped with a scoop of vanilla ice cream and chocolate drizzle.",
       "image": "coffee",
-      "stock": 32,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "5 mins",
       "badge": "Bestseller"
@@ -115,7 +115,7 @@
       "price": 15,
       "description": "Freshly brewed full-cream milk tea infused with crushed ginger, cardamom, and aromatic spices.",
       "image": "tea",
-      "stock": 95,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "3 mins",
       "badge": "Essential"
@@ -127,7 +127,7 @@
       "price": 30,
       "description": "Refreshing fizzy soda blended with freshly squeezed key lime, rock salt, and mint leaves.",
       "image": "lime",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "3 mins",
       "badge": "Refreshing"
@@ -139,7 +139,7 @@
       "price": 40,
       "description": "Soft melt-in-mouth milk solids dumplings soaked in warm rose and cardamom scented sugar syrup.",
       "image": "dessert",
-      "stock": 25,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "2 mins",
       "badge": "Sweet"
@@ -150,7 +150,7 @@
       "category": "Snacks",
       "price": 40,
       "description": "Crispy gram-flour coated spiced onion fritters served with tamarind chutney.",
-      "stock": 25,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "6 mins",
       "badge": "New",
@@ -162,8 +162,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -174,7 +174,7 @@
       "category": "Snacks",
       "price": 25,
       "description": "",
-      "stock": 2,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
@@ -186,7 +186,7 @@
       "category": "Beverages",
       "price": 30,
       "description": "",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "4 mins",
       "badge": "",
@@ -198,8 +198,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -210,7 +210,7 @@
       "category": "Snacks",
       "price": 25,
       "description": "",
-      "stock": 2,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
@@ -222,7 +222,7 @@
       "category": "Beverages",
       "price": 30,
       "description": "",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "4 mins",
       "badge": "",
@@ -234,8 +234,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -246,7 +246,7 @@
       "category": "Snacks",
       "price": 25,
       "description": "",
-      "stock": 2,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
@@ -258,7 +258,7 @@
       "category": "Beverages",
       "price": 30,
       "description": "",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "4 mins",
       "badge": "",
@@ -270,8 +270,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -282,7 +282,7 @@
       "category": "Snacks",
       "price": 25,
       "description": "",
-      "stock": 2,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
@@ -294,7 +294,7 @@
       "category": "Beverages",
       "price": 30,
       "description": "",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "4 mins",
       "badge": "",
@@ -306,8 +306,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -318,8 +318,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -330,7 +330,7 @@
       "category": "Snacks",
       "price": 25,
       "description": "",
-      "stock": 2,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
@@ -342,7 +342,7 @@
       "category": "Beverages",
       "price": 30,
       "description": "",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "4 mins",
       "badge": "",
@@ -354,8 +354,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -366,8 +366,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -378,7 +378,7 @@
       "category": "Snacks",
       "price": 25,
       "description": "",
-      "stock": 2,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
@@ -390,7 +390,7 @@
       "category": "Beverages",
       "price": 30,
       "description": "",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "4 mins",
       "badge": "",
@@ -402,8 +402,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -414,7 +414,7 @@
       "category": "Snacks",
       "price": 25,
       "description": "",
-      "stock": 2,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
@@ -426,7 +426,7 @@
       "category": "Beverages",
       "price": 30,
       "description": "",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "4 mins",
       "badge": "",
@@ -438,8 +438,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -450,7 +450,7 @@
       "category": "Snacks",
       "price": 25,
       "description": "",
-      "stock": 2,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
@@ -462,7 +462,7 @@
       "category": "Beverages",
       "price": 30,
       "description": "",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "4 mins",
       "badge": "",
@@ -474,8 +474,8 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
-      "stock": 0,
-      "isAvailable": false,
+      "stock": 35,
+      "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
       "image": "food-default"
@@ -486,7 +486,7 @@
       "category": "Snacks",
       "price": 25,
       "description": "",
-      "stock": 2,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "10 mins",
       "badge": "",
@@ -498,7 +498,7 @@
       "category": "Beverages",
       "price": 30,
       "description": "",
-      "stock": 45,
+      "stock": 35,
       "isAvailable": true,
       "prepTime": "4 mins",
       "badge": "",
@@ -510,6 +510,162 @@
       "category": "Desserts",
       "price": 60,
       "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792084540789",
+      "name": "Limited Samosa Portion",
+      "category": "Snacks",
+      "price": 25,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792084540816",
+      "name": "South Indian Filter Coffee",
+      "category": "Beverages",
+      "price": 30,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "4 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792123471302",
+      "name": "Sold Out Pastry",
+      "category": "Desserts",
+      "price": 60,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792124823782",
+      "name": "Sold Out Pastry",
+      "category": "Desserts",
+      "price": 60,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792124824128",
+      "name": "Limited Samosa Portion",
+      "category": "Snacks",
+      "price": 25,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792124824149",
+      "name": "South Indian Filter Coffee",
+      "category": "Beverages",
+      "price": 30,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "4 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792125194003",
+      "name": "Sold Out Pastry",
+      "category": "Desserts",
+      "price": 60,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792125194311",
+      "name": "Limited Samosa Portion",
+      "category": "Snacks",
+      "price": 25,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792125194330",
+      "name": "South Indian Filter Coffee",
+      "category": "Beverages",
+      "price": 30,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "4 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792125329630",
+      "name": "Sold Out Pastry",
+      "category": "Desserts",
+      "price": 60,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792125329940",
+      "name": "Limited Samosa Portion",
+      "category": "Snacks",
+      "price": 25,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "10 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792125329966",
+      "name": "South Indian Filter Coffee",
+      "category": "Beverages",
+      "price": 30,
+      "description": "",
+      "stock": 35,
+      "isAvailable": true,
+      "prepTime": "4 mins",
+      "badge": "",
+      "image": "food-default"
+    },
+    {
+      "id": "menu-1792125519551",
+      "name": "Sold Out Pastry",
+      "category": "Desserts",
+      "price": 60,
+      "description": "",
       "stock": 0,
       "isAvailable": false,
       "prepTime": "10 mins",
@@ -517,7 +673,7 @@
       "image": "food-default"
     },
     {
-      "id": "menu-1792084540789",
+      "id": "menu-1792125519969",
       "name": "Limited Samosa Portion",
       "category": "Snacks",
       "price": 25,
@@ -529,7 +685,7 @@
       "image": "food-default"
     },
     {
-      "id": "menu-1792084540816",
+      "id": "menu-1792125520005",
       "name": "South Indian Filter Coffee",
       "category": "Beverages",
       "price": 30,
@@ -542,6 +698,798 @@
     }
   ],
   "orders": [
+    {
+      "id": "ord-1073",
+      "token": "YR-1073",
+      "studentName": "yash rane",
+      "rollNumber": "25FCE023",
+      "phone": "5245245",
+      "pickupSlot": "01:30 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Preparing",
+      "createdAt": "2026-10-16T06:02:55.686Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1073",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T06:02:55.686Z"
+        },
+        {
+          "status": "Accepted",
+          "time": "2026-10-16T06:03:42.846Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T06:03:50.640Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1072",
+      "token": "YR-1072",
+      "studentName": "yash rane",
+      "rollNumber": "25FCE023",
+      "phone": "5245245",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Preparing",
+      "createdAt": "2026-10-16T04:52:04.372Z",
+      "totalAmount": 80,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        },
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 1,
+          "subtotal": 30
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1072",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:52:04.372Z"
+        },
+        {
+          "status": "Accepted",
+          "time": "2026-10-16T04:52:44.041Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T04:52:55.818Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1071",
+      "token": "YR-1071",
+      "studentName": "Eligible Canceller",
+      "rollNumber": "CS-009",
+      "phone": "N/A",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Cancelled",
+      "createdAt": "2026-10-16T04:38:39.915Z",
+      "totalAmount": 60,
+      "items": [
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 2,
+          "subtotal": 60
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1071",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:38:39.915Z"
+        },
+        {
+          "status": "Cancelled",
+          "time": "2026-10-16T04:38:39.934Z",
+          "reason": "Accidental order"
+        }
+      ]
+    },
+    {
+      "id": "ord-1070",
+      "token": "YR-1070",
+      "studentName": "Late Canceller",
+      "rollNumber": "CS-008",
+      "phone": "N/A",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Preparing",
+      "createdAt": "2026-10-16T04:38:39.853Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1070",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:38:39.853Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T04:38:39.864Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1069",
+      "token": "YR-1069",
+      "studentName": "Aarav Sharma",
+      "rollNumber": "CS-2024-099",
+      "phone": "N/A",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Paid",
+      "status": "Collected",
+      "createdAt": "2026-10-16T04:38:39.712Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1069",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:38:39.712Z"
+        },
+        {
+          "status": "Accepted",
+          "time": "2026-10-16T04:38:39.769Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T04:38:39.780Z"
+        },
+        {
+          "status": "Ready for Pickup",
+          "time": "2026-10-16T04:38:39.790Z"
+        },
+        {
+          "status": "Collected",
+          "time": "2026-10-16T04:38:39.799Z"
+        }
+      ],
+      "paidAt": "2026-10-16T04:38:39.799Z"
+    },
+    {
+      "id": "ord-1068",
+      "token": "YR-1068",
+      "studentName": "T2 Calc Student",
+      "rollNumber": "CS-002",
+      "phone": "N/A",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Placed",
+      "createdAt": "2026-10-16T04:38:39.648Z",
+      "totalAmount": 190,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 2,
+          "subtotal": 100
+        },
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 3,
+          "subtotal": 90
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1068",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:38:39.648Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1067",
+      "token": "YR-1067",
+      "studentName": "Eligible Canceller",
+      "rollNumber": "CS-009",
+      "phone": "N/A",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Cancelled",
+      "createdAt": "2026-10-16T04:35:29.899Z",
+      "totalAmount": 60,
+      "items": [
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 2,
+          "subtotal": 60
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1067",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:35:29.899Z"
+        },
+        {
+          "status": "Cancelled",
+          "time": "2026-10-16T04:35:29.914Z",
+          "reason": "Accidental order"
+        }
+      ]
+    },
+    {
+      "id": "ord-1066",
+      "token": "YR-1066",
+      "studentName": "Late Canceller",
+      "rollNumber": "CS-008",
+      "phone": "N/A",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Preparing",
+      "createdAt": "2026-10-16T04:35:29.855Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1066",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:35:29.855Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T04:35:29.862Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1065",
+      "token": "YR-1065",
+      "studentName": "Aarav Sharma",
+      "rollNumber": "CS-2024-099",
+      "phone": "N/A",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Paid",
+      "status": "Collected",
+      "createdAt": "2026-10-16T04:35:29.749Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1065",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:35:29.749Z"
+        },
+        {
+          "status": "Accepted",
+          "time": "2026-10-16T04:35:29.789Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T04:35:29.797Z"
+        },
+        {
+          "status": "Ready for Pickup",
+          "time": "2026-10-16T04:35:29.806Z"
+        },
+        {
+          "status": "Collected",
+          "time": "2026-10-16T04:35:29.814Z"
+        }
+      ],
+      "paidAt": "2026-10-16T04:35:29.814Z"
+    },
+    {
+      "id": "ord-1064",
+      "token": "YR-1064",
+      "studentName": "T2 Calc Student",
+      "rollNumber": "CS-002",
+      "phone": "N/A",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Placed",
+      "createdAt": "2026-10-16T04:35:29.704Z",
+      "totalAmount": 190,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 2,
+          "subtotal": 100
+        },
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 3,
+          "subtotal": 90
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1064",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:35:29.704Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1063",
+      "token": "YR-1063",
+      "studentName": "Eligible Canceller",
+      "rollNumber": "CS-009",
+      "phone": "N/A",
+      "pickupSlot": "02:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Cancelled",
+      "createdAt": "2026-10-16T04:33:14.269Z",
+      "totalAmount": 60,
+      "items": [
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 2,
+          "subtotal": 60
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1063",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:33:14.269Z"
+        },
+        {
+          "status": "Cancelled",
+          "time": "2026-10-16T04:33:14.284Z",
+          "reason": "Accidental order"
+        }
+      ]
+    },
+    {
+      "id": "ord-1062",
+      "token": "YR-1062",
+      "studentName": "Late Canceller",
+      "rollNumber": "CS-008",
+      "phone": "N/A",
+      "pickupSlot": "01:45 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Preparing",
+      "createdAt": "2026-10-16T04:33:14.209Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQQAAAEECAYAAADOCEoKAAAAAklEQVR4AewaftIAAAd2SURBVO3BMbIcWwpF0SOiAgOf+Q8QHwNHLQOnnVvxlC+VJf291o+fvwgAfjEBwDIBwDIBwDIBwDIBwDIBwDIBwDIBwDIBwDIBwDIBwDIBwHrpN3ik/nXTpU/mkbpiuvSOR+pkunTikTqZLp14pE6mS1d4pP5106WvMAHAMgHAMgHAMgHAMgHAMgHAMgHAeukG06VP5pF6mkfqZLp0J4/Up5sunXikTqZLV02XPplH6juZAGCZAGCZAGCZAGCZAGCZAGCZAGC99ACP1J2mS3fzSP3NpkvveKSumC5d4ZH6dB6pO02X/iQTACwTACwTACwTACwTACwTACwTAKyX8JE8UifTpSs8UnfzSJ1Ml66YLuF7mQBgmQBgmQBgmQBgmQBgmQBgmQBgvYRbTJeu8Ejdabp0t+kS/i4mAFgmAFgmAFgmAFgmAFgmAFgmAFgvPWC69F/nkfp0HqmT6dKdpkufbrr0LzEBwDIBwDIBwDIBwDIBwDIBwDIBwHrpBh4pXDNdOvFInUyXTjxS70yXTjxSJ9OlE4/UyXTpxCN1Ml26yiP1X2ICgGUCgGUCgGUCgGUCgGUCgGUCgGUCgPXSb5gu4Zrp0olH6mS69LTp0pOmS1dMl/D/TACwTACwTACwTACwTACwTACwTACwXvoNHqmT6dKJR+rTTZdOpktXeKSeNF26m0fqZLp0hUfqZLp04pH6dNOlP8kEAMsEAMsEAMsEAMsEAMsEAMsEAOul3zBdetJ06cQjdTJdescjdTJdOvFInUyXTjxSV3ikrpounXikTqZLV3ikTqZLJx6pp02X7uSROpkufYUJAJYJAJYJAJYJAJYJAJYJAJYJANZLv8Ejdafp0p08Uu9Ml048UifTpTt5pO7mkTqZLp14pK6YLj1tunTikXrSdOk7mQBgmQBgmQBgmQBgmQBgmQBgmQBgvfQbpktXeKSu8EidTJeu8kidTJdOPFJXTJeu8EidTJfe8UhdMV068Ug9abr0jkfqZLp0J4/UyXTpO5kAYJkAYJkAYJkAYJkAYJkAYJkAYP34+Ys+jEfqadOlE4/UyXTpCo/UFdOlE4/U06ZLV3ikTqZLT/NIXTFd+pNMALBMALBMALBMALBMALBMALBMALB+/PxFX+SROpku3ckjdcV06W4eqSumS0/zSJ1Ml67wSF0xXTrxSD1tunTikTqZLp14pE6mS19hAoBlAoBlAoBlAoBlAoBlAoBlAoD10m+YLp14pE6mSyceqZPp0hUeqXemSyceqZPp0olH6gqP1Ml06W83XbpiunTikfrbTZe+kwkAlgkAlgkAlgkAlgkAlgkAlgkAlgkA1ks3mC5dMV068UidTJdOpkvveKSe5JE6mS5d4ZF62nTp002XTjxSV0yXTjxSJ9Ol72QCgGUCgGUCgGUCgGUCgGUCgGUCgPXSb/BInUyXPplH6p3p0pOmS3eaLr3jkTrxSF0xXbrCI3UyXTqZLl01XbrCI3UyXfqTTACwTACwTACwTACwTACwTACwTACwXrqBR+qTTZfe8Uh9Mo/U06ZLV3ikrpguXeGR+tt5pE6mS19hAoBlAoBlAoBlAoBlAoBlAoBlAoD10g2mSyceqZPp0hUeqadNl048Un87j9SdpksnHqkrpkvveKROpksnHqk7TZe+kwkAlgkAlgkAlgkAlgkAlgkAlgkA1ksfyCN1xXTpKo/UFR6pk+nSiUfqTtOldzxSV0yXrvBInUyXrvBIvTNdOvFInUyXrvBInUyXvpMJAJYJAJYJAJYJAJYJAJYJAJYJANZLf6Hp0olH6mnTpTtNl67wSL0zXbrCI3UyXTqZLp14pO7mkbqTR+oKj9TJdOkrTACwTACwTACwTACwTACwTACwTACwfvz8Rfgyj9SdpksnHqmT6dLTPFJPmi7dzSP1yaZLX2ECgGUCgGUCgGUCgGUCgGUCgGUCgPXSb/BI/eumSyfTpX+dR+pkuvQ380i9M1160nTpTzIBwDIBwDIBwDIBwDIBwDIBwDIBwDIBwHrpBtOlT+aRusojdcV06cQjdSeP1DvTpSumS3fySF0xXXradOnEI3UyXfpOJgBYJgBYJgBYJgBYJgBYJgBYJgBYLz3AI3Wn6dLTpksnHqknTZfe8Ug9abp0hUfqadOlE4/UJzEBwDIBwDIBwDIBwDIBwDIBwDIBwHoJH2m6dOKROvFIfbrp0p2mS0/zSN3JI3UyXfoKEwAsEwAsEwAsEwAsEwAsEwAsEwCsl3ALj9TJdOmK6dKJR+pp06VP5pG623TpCo/UyXTpO5kAYJkAYJkAYJkAYJkAYJkAYJkAYL30gOnS3266dOKROvFInUyXTjxSV0yX3vFInUyX7uSRutN06R2P1Ml06cQjdTJd+iQmAFgmAFgmAFgmAFgmAFgmAFgmAFgv3cAj9a/zSJ1Ml048UneaLl01XTrxSJ1Ml66YLl3hkTqZLt1tunTikTqZLv1JJgBYJgBYJgBYJgBYJgBYJgBYJgBYP37+IgD4xQQAywQAywQAywQAywQAywQAywQAywQAywQAywQAywQA63/9Pjg5h5JniAAAAABJRU5ErkJggg==",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1062",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:33:14.209Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T04:33:14.220Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1061",
+      "token": "YR-1061",
+      "studentName": "Aarav Sharma",
+      "rollNumber": "CS-2024-099",
+      "phone": "N/A",
+      "pickupSlot": "01:45 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Paid",
+      "status": "Collected",
+      "createdAt": "2026-10-16T04:33:14.085Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1061",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:33:14.085Z"
+        },
+        {
+          "status": "Accepted",
+          "time": "2026-10-16T04:33:14.126Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T04:33:14.135Z"
+        },
+        {
+          "status": "Ready for Pickup",
+          "time": "2026-10-16T04:33:14.145Z"
+        },
+        {
+          "status": "Collected",
+          "time": "2026-10-16T04:33:14.156Z"
+        }
+      ],
+      "paidAt": "2026-10-16T04:33:14.156Z"
+    },
+    {
+      "id": "ord-1060",
+      "token": "YR-1060",
+      "studentName": "T2 Calc Student",
+      "rollNumber": "CS-002",
+      "phone": "N/A",
+      "pickupSlot": "01:45 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Placed",
+      "createdAt": "2026-10-16T04:33:14.042Z",
+      "totalAmount": 190,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 2,
+          "subtotal": 100
+        },
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 3,
+          "subtotal": 90
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQQAAAEECAYAAADOCEoKAAAAAklEQVR4AewaftIAAAeaSURBVO3BsZJcSQhFwSuiAwOf//9AfAwcrQzsmpgpPfVIezJ//PxFAPCLCQCWCQCWCQCWCQCWCQCWCQCWCQCWCQCWCQCWCQCWCQCWCQDWS1/gkfrXTZdOPFIn06XvzCP1kenSDY/UyXTphkfqZLp04pH6102XPsMEAMsEAMsEAMsEAMsEAMsEAMsEAOulB0yXvjOP1K3p0pM8UjemSyfTpe/OI3UyXXradOk780j9TiYAWCYAWCYAWCYAWCYAWCYAWCYAWC+9gUfqSdOld/NInUyXTqZLNzxSJ9Olj3iknuSRuuGROpkuPc0j9aTp0p9kAoBlAoBlAoBlAoBlAoBlAoBlAoD1Er7EI3UyXXqSR+pkunTikXradOnEI3VjuoTfywQAywQAywQAywQAywQAywQAywQA6yU8wiN1Y7p0wyN1a7r0pOnSDY/UyXQJn2MCgGUCgGUCgGUCgGUCgGUCgGUCgPXSG0yX/u+mSzjzSH1306V/iQkAlgkAlgkAlgkAlgkAlgkAlgkA1ksP8Ej9302XTjxSJ9OlG9OlE4/ULY/UyXTpxCN1Ml068Ug9zSP1f2ICgGUCgGUCgGUCgGUCgGUCgGUCgGUCgPXj5y/Cp3mkbkyX3skj9ZHp0olH6sZ0Cd+LCQCWCQCWCQCWCQCWCQCWCQCWCQDWS1/gkTqZLj3JI3UyXTrxSL2bR+pkunTikXqaR+pkunTikbrhkTqZLp14pL676dINj9TJdOkzTACwTACwTACwTACwTACwTACwTACwfvz8Rb+ZR+rGdOmGR+pkuvQRj9SN6dKJR+pkunTikTqZLt3ySN2YLj3JI3UyXTrxSP3rpkufYQKAZQKAZQKAZQKAZQKAZQKAZQKA9ePnL/okj9Q7TZdueKQ+Ml068UjdmC6deKROpksnHql3my69k0fqZLr0EY/UyXTpnTxSJ9OlzzABwDIBwDIBwDIBwDIBwDIBwDIBwPrx8xd9Mx6pJ02XbnmkTqZLJx6pd5oufcQj9aTp0pM8UremSyceqZPp0g2P1I3p0meYAGCZAGCZAGCZAGCZAGCZAGCZAGC99AYeqRvTpROP1IlH6tZ06cZ06cQjdTJdOvFI3ZounXiknuSROpku3Zgu3ZouvdN06XcyAcAyAcAyAcAyAcAyAcAyAcAyAcB66Qs8UjemSyceqRvTpVseqRseqZPp0g2P1A2P1EemSyfTpRseqZPp0olH6mS6dOKRerfp0g2P1Ml06TNMALBMALBMALBMALBMALBMALBMALBeesB06cQjdcMjdTJdOvFIPW269E7TpVseqSdNl25Ml25Ml97NI3UyXTrxSP1OJgBYJgBYJgBYJgBYJgBYJgBYJgBYJgBYLz3AI/WdTZfezSN1Ml16kkfq3TxSJ9Old/NInUyXbkyXTjxSf5IJAJYJAJYJAJYJAJYJAJYJAJYJANZL39B06cQjdcMj9bTp0g2P1Ml06cQjdWu6dOKRujFdOvFInUyXTjxSJ9Olj0yXbnikTqZLN6ZLv5MJAJYJAJYJAJYJAJYJAJYJAJYJANaPn7/okzxSJ9OlE4/UyXTphkfqZLr0EY/Uk6ZL/3ceqZPp0olH6rubLt3wSN2YLn2GCQCWCQCWCQCWCQCWCQCWCQCWCQDWS18wXXqSR+pkunTDI/W06dKJR+pkunTikXq36dKN6dJ3N1068UideKRuTJdOPFK/kwkAlgkAlgkAlgkAlgkAlgkAlgkA1kvf0HTpSdOlj3ik3skj9aTp0kc8Ujc8Uk+aLj3NI3UyXXqSR+pPMgHAMgHAMgHAMgHAMgHAMgHAMgHAeukLPFJP8kg9ySP1kenSDY/UyXTphkfqbzddOvFInXik3s0jdWO6dDJdOvFI/U4mAFgmAFgmAFgmAFgmAFgmAFgmAFgvfcF06f/OI/U380i9m0fqZLp04pE6mS49zSN1Ml36m5gAYJkAYJkAYJkAYJkAYJkAYJkAYL30BR6pf9106cZ06cQj9aTp0i2P1IlH6mS6dMMj9SSP1EemSzc8UjemS3+SCQCWCQCWCQCWCQCWCQCWCQCWCQCWCQDWSw+YLn1nHqlb06Ub06UbHqkbHqmPTJdOPFInHqkb06UTj9SN6dK7TZdOPFJ/kgkAlgkAlgkAlgkAlgkAlgkAlgkA1ktv4JF60nTpaR6pJ02Xbnik/nYeqRseqb/ddOlPMgHAMgHAMgHAMgHAMgHAMgHAMgHAeglfMl068UidTJdOPFIn06W/3XTpxCN1Ml068UidTJf+dh6pk+nSZ5gAYJkAYJkAYJkAYJkAYJkAYJkAYL2ER0yXTjxSJ9OlE4/UjenSRzxSJ9OlE4/UiUfqZLp04pE6mS797TxSf5IJAJYJAJYJAJYJAJYJAJYJAJYJANZLbzBd+td5pE6mSyceqSd5pG55pJ7kkXqSR+oj06UTj9SN6dJ3YgKAZQKAZQKAZQKAZQKAZQKAZQKA9dIDPFL/Oo/UyXTp/266dMMj9aTp0kc8UifTpROP1JOmS7+TCQCWCQCWCQCWCQCWCQCWCQCWCQDWj5+/CAB+MQHAMgHAMgHAMgHAMgHAMgHAMgHAMgHAMgHAMgHAMgHA+g+nziw3iYP09gAAAABJRU5ErkJggg==",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1060",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:33:14.042Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1059",
+      "token": "YR-1059",
+      "studentName": "Eligible Canceller",
+      "rollNumber": "CS-009",
+      "phone": "N/A",
+      "pickupSlot": "01:45 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Cancelled",
+      "createdAt": "2026-10-16T04:27:04.084Z",
+      "totalAmount": 60,
+      "items": [
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 2,
+          "subtotal": 60
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1059",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:27:04.084Z"
+        },
+        {
+          "status": "Cancelled",
+          "time": "2026-10-16T04:27:04.099Z",
+          "reason": "Accidental order"
+        }
+      ]
+    },
+    {
+      "id": "ord-1058",
+      "token": "YR-1058",
+      "studentName": "Late Canceller",
+      "rollNumber": "CS-008",
+      "phone": "N/A",
+      "pickupSlot": "01:45 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Preparing",
+      "createdAt": "2026-10-16T04:27:04.039Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1058",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:27:04.039Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T04:27:04.046Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1057",
+      "token": "YR-1057",
+      "studentName": "Aarav Sharma",
+      "rollNumber": "CS-2024-099",
+      "phone": "N/A",
+      "pickupSlot": "01:45 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Paid",
+      "status": "Collected",
+      "createdAt": "2026-10-16T04:27:03.919Z",
+      "totalAmount": 50,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 1,
+          "subtotal": 50
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1057",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:27:03.919Z"
+        },
+        {
+          "status": "Accepted",
+          "time": "2026-10-16T04:27:03.963Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-16T04:27:03.972Z"
+        },
+        {
+          "status": "Ready for Pickup",
+          "time": "2026-10-16T04:27:03.981Z"
+        },
+        {
+          "status": "Collected",
+          "time": "2026-10-16T04:27:03.991Z"
+        }
+      ],
+      "paidAt": "2026-10-16T04:27:03.991Z"
+    },
+    {
+      "id": "ord-1056",
+      "token": "YR-1056",
+      "studentName": "T2 Calc Student",
+      "rollNumber": "CS-002",
+      "phone": "N/A",
+      "pickupSlot": "01:45 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Placed",
+      "createdAt": "2026-10-16T04:27:03.866Z",
+      "totalAmount": 190,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 2,
+          "subtotal": 100
+        },
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 3,
+          "subtotal": 90
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1056",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:27:03.866Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1055",
+      "token": "YR-1055",
+      "studentName": "T2 Calc Student",
+      "rollNumber": "CS-002",
+      "phone": "N/A",
+      "pickupSlot": "01:45 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Placed",
+      "createdAt": "2026-10-16T04:04:31.378Z",
+      "totalAmount": 190,
+      "items": [
+        {
+          "id": "menu-1",
+          "name": "Masala Dosa",
+          "price": 50,
+          "quantity": 2,
+          "subtotal": 100
+        },
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 3,
+          "subtotal": 90
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1055",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T04:04:31.378Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1054",
+      "token": "YR-1054",
+      "studentName": "yash rane",
+      "rollNumber": "25FCE023",
+      "phone": "5245245",
+      "pickupSlot": "01:30 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Placed",
+      "createdAt": "2026-10-16T03:56:00.685Z",
+      "totalAmount": 170,
+      "items": [
+        {
+          "id": "menu-7",
+          "name": "Chole Bhature (2 Pcs)",
+          "price": 85,
+          "quantity": 2,
+          "subtotal": 170
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1054",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T03:56:00.685Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-1053",
+      "token": "YR-1053",
+      "studentName": "Aarav Sharma",
+      "rollNumber": "CS-2024-099",
+      "phone": "9876543210",
+      "pickupSlot": "01:00 PM",
+      "paymentMethod": "Cash at Pickup",
+      "paymentStatus": "Pending",
+      "status": "Placed",
+      "createdAt": "2026-10-16T03:18:52.534Z",
+      "totalAmount": 30,
+      "items": [
+        {
+          "id": "menu-2",
+          "name": "Vada Pav (2 Pcs)",
+          "price": 30,
+          "quantity": 1,
+          "subtotal": 30
+        }
+      ],
+      "qrDataUrl": "data:image/png;base64,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",
+      "qrTrackUrl": "http://localhost:3000/?track=YR-1053",
+      "statusHistory": [
+        {
+          "status": "Placed",
+          "time": "2026-10-16T03:18:52.534Z"
+        }
+      ]
+    },
     {
       "id": "ord-1052",
       "token": "YR-1052",
@@ -734,7 +1682,7 @@
       "pickupSlot": "01:00 PM",
       "paymentMethod": "Cash at Pickup",
       "paymentStatus": "Pending",
-      "status": "Placed",
+      "status": "Cancelled",
       "createdAt": "2026-10-15T17:15:18.236Z",
       "totalAmount": 60,
       "items": [
@@ -752,6 +1700,11 @@
         {
           "status": "Placed",
           "time": "2026-10-15T17:15:18.236Z"
+        },
+        {
+          "status": "Cancelled",
+          "time": "2026-10-15T17:18:16.758Z",
+          "reason": "Cancelled by student"
         }
       ]
     },
@@ -764,7 +1717,7 @@
       "pickupSlot": "01:00 PM",
       "paymentMethod": "Cash at Pickup",
       "paymentStatus": "Pending",
-      "status": "Placed",
+      "status": "Preparing",
       "createdAt": "2026-10-15T17:14:01.754Z",
       "totalAmount": 150,
       "items": [
@@ -796,6 +1749,14 @@
         {
           "status": "Placed",
           "time": "2026-10-15T17:14:01.754Z"
+        },
+        {
+          "status": "Accepted",
+          "time": "2026-10-15T17:17:42.522Z"
+        },
+        {
+          "status": "Preparing",
+          "time": "2026-10-15T17:17:44.542Z"
         }
       ]
     },
@@ -2620,5 +3581,5 @@
       "createdAt": "2026-10-15T16:20:00.000Z"
     }
   ],
-  "nextOrderNumber": 1053
+  "nextOrderNumber": 1074
 }

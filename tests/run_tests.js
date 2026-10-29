@@ -90,10 +90,11 @@ async function runTests() {
     const outItemId = outItemRes.body.data.id;
 
     // Attempt to order unavailable item
+    const slotT1 = await getAvailableSlot('01:30 PM');
     const orderOutRes = await request('POST', '/api/orders', {
       studentName: 'T1 Student',
       rollNumber: 'CS-001',
-      pickupSlot: '12:30 PM',
+      pickupSlot: slotT1,
       items: [{ id: outItemId, quantity: 1 }]
     });
     assert(orderOutRes.status === 400 && orderOutRes.body.success === false, 'Ordering unavailable item rejected with 400 Bad Request', orderOutRes.body.message);
@@ -130,16 +131,17 @@ async function runTests() {
     // TEST 3: Checkout validates required fields and pickup slot
     // ----------------------------------------------------
     console.log('\n▶ Test 3: Checkout required fields & pickup slot validation...');
-    const missName = await request('POST', '/api/orders', { rollNumber: 'CS-1', pickupSlot: '12:30 PM', items: [{ id: itemA.id, quantity: 1 }] });
+    const slotT3 = await getAvailableSlot('01:15 PM');
+    const missName = await request('POST', '/api/orders', { rollNumber: 'CS-1', pickupSlot: slotT3, items: [{ id: itemA.id, quantity: 1 }] });
     assert(missName.status === 400, 'Rejects missing studentName with 400');
 
-    const missRoll = await request('POST', '/api/orders', { studentName: 'Test', pickupSlot: '12:30 PM', items: [{ id: itemA.id, quantity: 1 }] });
+    const missRoll = await request('POST', '/api/orders', { studentName: 'Test', pickupSlot: slotT3, items: [{ id: itemA.id, quantity: 1 }] });
     assert(missRoll.status === 400, 'Rejects missing rollNumber with 400');
 
     const invalidSlot = await request('POST', '/api/orders', { studentName: 'Test', rollNumber: 'CS-1', pickupSlot: 'Invalid Slot 99:99', items: [{ id: itemA.id, quantity: 1 }] });
     assert(invalidSlot.status === 400, 'Rejects invalid pickup slot with 400');
 
-    const emptyCart = await request('POST', '/api/orders', { studentName: 'Test', rollNumber: 'CS-1', pickupSlot: '12:30 PM', items: [] });
+    const emptyCart = await request('POST', '/api/orders', { studentName: 'Test', rollNumber: 'CS-1', pickupSlot: slotT3, items: [] });
     assert(emptyCart.status === 400, 'Rejects empty items array with 400');
 
     // ----------------------------------------------------
@@ -271,10 +273,11 @@ async function runTests() {
     const lowItemId = lowItemRes.body.data.id;
 
     // Try ordering 5 portions
+    const slotT10 = await getAvailableSlot('02:00 PM');
     const exceedOrder = await request('POST', '/api/orders', {
       studentName: 'Greedy Order',
       rollNumber: 'CS-010',
-      pickupSlot: '01:45 PM',
+      pickupSlot: slotT10,
       items: [{ id: lowItemId, quantity: 5 }]
     });
     assert(exceedOrder.status === 400 && exceedOrder.body.success === false,
@@ -364,10 +367,12 @@ async function runTests() {
   const passedCount = testResults.filter(t => t.passed).length;
   const totalCount = testResults.length;
   console.log(`📊 TEST SUITE SUMMARY: ${passedCount} / ${totalCount} PASSED`);
-  if (passedCount === totalCount) {
-    console.log('🎉 ALL 14 PHASE 3 VERIFICATION TESTS PASSED SUCCESSFULLY!');
+  if (totalCount > 0 && passedCount === totalCount) {
+    console.log('🎉 ALL INTEGRATION TESTS PASSED SUCCESSFULLY!');
+    process.exit(0);
   } else {
     console.log('⚠️ SOME TESTS FAILED. PLEASE REVIEW ABOVE LOGS.');
+    process.exit(1);
   }
   console.log('======================================================\n');
 }

@@ -204,6 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize YULU AI Autonomous Voice Order Copilot
   initYuluCopilot();
 
+  // Initialize Visual Color Theme (Defaults to Warm Sunset Amber)
+  initColorTheme();
+
   // Check URL query parameters for direct QR scan tracking (?track=YR-XXXX)
   const urlParams = new URLSearchParams(window.location.search);
   const trackToken = urlParams.get('track');
@@ -625,14 +628,14 @@ function closeCartDrawer() {
 // 5. CHECKOUT & TOKEN CREATION
 // ==========================================================================
 
-function openCheckoutModal() {
+async function openCheckoutModal() {
   if (state.cart.length === 0) {
     showToast('Please add items to cart first', 'error');
     return;
   }
 
   closeCartDrawer();
-  loadSlots(); // Refresh slot capacity before checkout
+  await loadSlots(); // Refresh slot capacity before checkout
 
   // Populate preview
   const totalAmount = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -735,7 +738,32 @@ function showSuccessModal(order) {
 }
 
 function closeSuccessModal() {
-  document.getElementById('success-modal-overlay').classList.remove('active');
+  const modal = document.getElementById('success-modal-overlay');
+  if (modal) modal.classList.remove('active');
+}
+
+function exitToExploreMenu() {
+  closeSuccessModal();
+  switchView('student');
+
+  // Reset any active category filter and search bar so user sees full menu
+  state.selectedCategory = 'All';
+  const searchInput = document.getElementById('menu-search-input');
+  if (searchInput) searchInput.value = '';
+  document.querySelectorAll('.cat-pill').forEach(pill => {
+    pill.classList.toggle('active', pill.dataset.category === 'All');
+  });
+  renderMenu();
+
+  // Smooth scroll to the menu section
+  setTimeout(() => {
+    const target = document.getElementById('menu-categories-bar') || document.getElementById('menu-container');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 120);
+
+  showToast('Order confirmed! Explore our full menu for more food & beverages 🍱✨', 'success');
 }
 
 function viewPlacedOrderInTracker() {
@@ -2839,3 +2867,65 @@ function processYuluCommand(rawTranscript) {
   yuluSpeak(`Searching for ${cleanSearch}.`);
   updateYuluOrbUI('idle', `Search: "${cleanSearch}"`, 'Check matching dishes on screen');
 }
+
+// ==========================================================================
+// COLOR THEME SYSTEM (Warm Sunset Amber, Gourmet Gold, Crimson Feast, Emerald)
+// ==========================================================================
+
+function initColorTheme() {
+  const savedTheme = localStorage.getItem('smart_canteen_theme') || 'warm-amber';
+  applyColorTheme(savedTheme);
+  const selector = document.getElementById('theme-selector');
+  if (selector) selector.value = savedTheme;
+}
+
+function changeColorTheme(themeName) {
+  applyColorTheme(themeName);
+  try {
+    localStorage.setItem('smart_canteen_theme', themeName);
+  } catch (e) {}
+  const names = {
+    'warm-amber': '🌅 Warm Sunset Amber',
+    'gourmet-gold': '☀️ Gourmet Gold',
+    'crimson-feast': '🍷 Crimson Feast',
+    'emerald-bistro': '🍃 Emerald Bistro'
+  };
+  showToast(`Theme changed to ${names[themeName] || themeName}`, 'info');
+}
+
+function applyColorTheme(themeName) {
+  document.documentElement.setAttribute('data-theme', themeName);
+  const selector = document.getElementById('theme-selector');
+  if (selector) selector.value = themeName;
+}
+
+// Global Keyboard Listener (Escape to dismiss modals & exit to explore)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const successModal = document.getElementById('success-modal-overlay');
+    if (successModal && successModal.classList.contains('active')) {
+      exitToExploreMenu();
+      return;
+    }
+    const checkoutModal = document.getElementById('checkout-modal-overlay');
+    if (checkoutModal && checkoutModal.classList.contains('active')) {
+      closeCheckoutModal();
+      return;
+    }
+    const cartDrawer = document.getElementById('cart-drawer');
+    if (cartDrawer && cartDrawer.classList.contains('active')) {
+      closeCartDrawer();
+      return;
+    }
+    const qrModal = document.getElementById('qr-modal-overlay');
+    if (qrModal && qrModal.classList.contains('active')) {
+      closeQrExpandedModal();
+      return;
+    }
+    const menuModal = document.getElementById('menu-modal-overlay');
+    if (menuModal && menuModal.classList.contains('active')) {
+      closeMenuModal();
+      return;
+    }
+  }
+});
